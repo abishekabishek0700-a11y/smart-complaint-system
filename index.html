@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Complaint & Service Request System</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        :root[data-theme="dark"]{--bg:#0f0c29;--bg2:#1a1740;--card:rgba(255,255,255,0.06);--card-border:rgba(255,255,255,0.1);--text:#ffffff;--text-muted:#aaaaaa;--input-bg:rgba(255,255,255,0.08);--input-border:rgba(255,255,255,0.2);--nav-bg:rgba(15,12,41,0.97);--sidebar-bg:#13102e;}
+        :root[data-theme="light"]{--bg:#f0f2f5;--bg2:#ffffff;--card:rgba(255,255,255,0.95);--card-border:rgba(0,0,0,0.08);--text:#1a1a1a;--text-muted:#666666;--input-bg:#f8f9fa;--input-border:rgba(0,0,0,0.15);--nav-bg:rgba(255,255,255,0.98);--sidebar-bg:#ffffff;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);min-height:100vh;color:var(--text);transition:all 0.3s;}
+        #homePage{display:block;}
+        .home-nav{position:fixed;top:0;left:0;right:0;height:65px;background:var(--nav-bg);border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;z-index:100;backdrop-filter:blur(20px);box-shadow:0 2px 20px rgba(0,0,0,0.3);}
+        .home-nav-left{display:flex;align-items:center;gap:12px;}
+        .home-hamburger{background:none;border:none;color:var(--text);cursor:pointer;font-size:22px;padding:6px;border-radius:8px;}
+        .home-logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f7971e,#ffd200);display:flex;align-items:center;justify-content:center;font-size:20px;}
+        .home-nav-title{color:#f7971e;font-size:17px;font-weight:bold;}
+        .home-nav-right{display:flex;align-items:center;gap:12px;}
+        .theme-wrap{display:flex;align-items:center;gap:6px;}
+        .theme-toggle{position:relative;width:46px;height:24px;cursor:pointer;}
+        .theme-toggle input{opacity:0;width:0;height:0;}
+        .toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;transition:0.3s;}
+        .toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#f7971e;border-radius:50%;transition:0.3s;}
+        input:checked+.toggle-track .toggle-thumb{transform:translateX(22px);}
+        .btn-login-nav{padding:8px 20px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;}
+        .home-content{padding-top:65px;min-height:100vh;}
+        .hero-section{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);padding:60px 20px 50px;text-align:center;position:relative;overflow:hidden;}
+        .hero-section::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(247,151,30,0.1) 0%,transparent 60%);animation:pulse 4s ease-in-out infinite;}
+        @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+        .gov-logo{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#f7971e,#ffd200);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 15px;box-shadow:0 8px 30px rgba(247,151,30,0.4);animation:float 3s ease-in-out infinite;position:relative;z-index:1;}
+        @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+        .gov-title{color:#f7971e;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;position:relative;z-index:1;}
+        .app-name{color:#ffffff;font-size:28px;font-weight:bold;margin-bottom:8px;position:relative;z-index:1;}
+        .app-tagline{color:rgba(255,255,255,0.7);font-size:15px;margin-bottom:30px;position:relative;z-index:1;}
+        .hero-btn{display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 6px 25px rgba(247,151,30,0.5);position:relative;z-index:1;}
+        .features-section{padding:40px 20px;max-width:1000px;margin:0 auto;}
+        .features-title{text-align:center;color:var(--text);font-size:22px;font-weight:bold;margin-bottom:8px;}
+        .features-sub{text-align:center;color:var(--text-muted);font-size:14px;margin-bottom:30px;}
+        .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
+        .feature-card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:22px;text-align:center;transition:transform 0.2s;}
+        .feature-card:hover{transform:translateY(-4px);border-color:#f7971e;}
+        .feature-icon{font-size:36px;margin-bottom:12px;}
+        .feature-card h4{color:#f7971e;font-size:15px;margin-bottom:6px;}
+        .feature-card p{color:var(--text-muted);font-size:12px;line-height:1.5;}
+        .stats-section{background:linear-gradient(135deg,rgba(247,151,30,0.1),rgba(255,210,0,0.05));border:1px solid rgba(247,151,30,0.2);border-radius:20px;padding:30px;margin:0 auto 40px;max-width:960px;}
+        .stats-title{text-align:center;color:#f7971e;font-size:16px;font-weight:bold;margin-bottom:20px;}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;}
+        .stat-item{text-align:center;}
+        .stat-num{color:#f7971e;font-size:28px;font-weight:bold;}
+        .stat-label{color:var(--text-muted);font-size:12px;margin-top:4px;}
+        .how-section{padding:20px 20px 50px;max-width:1000px;margin:0 auto;}
+        .how-title{text-align:center;color:var(--text);font-size:20px;font-weight:bold;margin-bottom:25px;}
+        .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;}
+        .step-card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:18px;text-align:center;}
+        .step-num{width:35px;height:35px;border-radius:50%;background:linear-gradient(135deg,#f7971e,#ffd200);display:flex;align-items:center;justify-content:center;font-weight:bold;color:#1a1a1a;font-size:14px;margin:0 auto 10px;}
+        .step-card p{color:var(--text-muted);font-size:12px;margin-top:6px;}
+        .step-card h4{color:var(--text);font-size:13px;}
+        .home-footer{background:var(--nav-bg);border-top:1px solid var(--card-border);padding:20px;text-align:center;}
+        .home-footer p{color:var(--text-muted);font-size:12px;}
+        .home-sidebar{position:fixed;top:65px;left:-280px;width:270px;height:calc(100vh - 65px);background:var(--sidebar-bg);border-right:1px solid var(--card-border);z-index:99;transition:left 0.3s;overflow-y:auto;}
+        .home-sidebar.open{left:0;}
+        .home-sidebar-info{padding:20px;background:linear-gradient(135deg,rgba(247,151,30,0.15),rgba(255,210,0,0.05));border-bottom:1px solid var(--card-border);}
+        .home-sidebar-info h3{color:#f7971e;font-size:16px;margin-bottom:5px;}
+        .home-sidebar-info p{color:var(--text-muted);font-size:12px;line-height:1.6;}
+        .home-sidebar-menu{padding:10px 0;}
+        .home-menu-item{display:flex;align-items:center;gap:12px;padding:14px 20px;color:var(--text-muted);font-size:14px;border-left:3px solid transparent;}
+        .home-menu-item.clickable{cursor:pointer;transition:all 0.2s;}
+        .home-menu-item.clickable:hover{background:var(--card);color:var(--text);border-left-color:#f7971e;}
+        .home-menu-item.locked{opacity:0.5;}
+        .lock-icon{margin-left:auto;font-size:12px;}
+        .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:98;display:none;}
+        .sidebar-overlay.show{display:block;}
+        .auth-container{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;background:var(--bg);}
+        .auth-box{background:var(--card);border-radius:20px;padding:35px;width:100%;max-width:420px;border:1px solid var(--card-border);backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+        .auth-box h2{color:#f7971e;text-align:center;margin-bottom:20px;font-size:22px;}
+        .auth-box input,.auth-box select{width:100%;padding:12px 15px;margin-bottom:12px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;}
+        .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;margin-bottom:10px;}
+        .btn-link{width:100%;padding:10px;background:transparent;color:#f7971e;border:1px solid #f7971e;border-radius:10px;font-size:14px;cursor:pointer;}
+        .lang-selector{display:flex;gap:6px;justify-content:center;margin-bottom:15px;flex-wrap:wrap;}
+        .lang-btn{padding:5px 11px;border-radius:20px;border:1px solid #f7971e;background:transparent;color:#f7971e;cursor:pointer;font-size:12px;}
+        .lang-btn.active{background:#f7971e;color:#1a1a1a;font-weight:bold;}
+        .app-container{display:none;}
+        .top-nav{position:fixed;top:0;left:0;right:0;height:60px;background:var(--nav-bg);border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;backdrop-filter:blur(20px);}
+        .nav-left{display:flex;align-items:center;gap:12px;}
+        .hamburger{background:none;border:none;color:var(--text);cursor:pointer;font-size:22px;padding:5px;border-radius:8px;}
+        .nav-title{color:#f7971e;font-size:17px;font-weight:bold;}
+        .nav-right{display:flex;align-items:center;gap:10px;}
+        .ai-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;background:rgba(156,39,176,0.3);color:#ce93d8;}
+        .firebase-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;background:rgba(255,152,0,0.3);color:#ff9800;margin-left:4px;}
+        .btn-logout-top{padding:7px 15px;background:#e94560;color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:bold;}
+        .nav-user{color:var(--text-muted);font-size:13px;}
+        .sidebar{position:fixed;top:60px;left:-280px;width:270px;height:calc(100vh - 60px);background:var(--sidebar-bg);border-right:1px solid var(--card-border);z-index:99;transition:left 0.3s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;box-shadow:5px 0 30px rgba(0,0,0,0.2);}
+        .sidebar.open{left:0;}
+        .sidebar-profile{padding:25px 20px 20px;background:linear-gradient(135deg,rgba(247,151,30,0.15),rgba(255,210,0,0.1));border-bottom:1px solid var(--card-border);text-align:center;}
+        .sidebar-avatar{width:65px;height:65px;border-radius:50%;background:linear-gradient(135deg,#f7971e,#ffd200);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 10px;box-shadow:0 4px 15px rgba(247,151,30,0.4);}
+        .sidebar-name{color:var(--text);font-size:15px;font-weight:bold;margin-bottom:3px;}
+        .sidebar-role{color:#f7971e;font-size:12px;font-weight:bold;}
+        .sidebar-stats{display:flex;gap:8px;margin-top:12px;}
+        .sidebar-stat{flex:1;background:var(--card);border-radius:8px;padding:8px 4px;text-align:center;border:1px solid var(--card-border);}
+        .sidebar-stat h4{color:#f7971e;font-size:16px;margin-bottom:2px;}
+        .sidebar-stat p{color:var(--text-muted);font-size:10px;}
+        .sidebar-menu{padding:10px 0;}
+        .menu-item{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;color:var(--text-muted);font-size:14px;font-weight:500;}
+        .menu-item:hover{background:var(--card);color:var(--text);border-left-color:#f7971e;}
+        .menu-item.active{background:rgba(247,151,30,0.1);color:#f7971e;border-left-color:#f7971e;font-weight:bold;}
+        .menu-icon{font-size:18px;width:24px;text-align:center;}
+        .menu-badge{margin-left:auto;background:#e94560;color:white;font-size:10px;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center;}
+        .main-content{margin-top:60px;padding:20px;min-height:calc(100vh - 60px);background:var(--bg);}
+        .page{display:none;max-width:950px;margin:0 auto;}
+        .page.active{display:block;}
+        .page-header{margin-bottom:20px;}
+        .page-header h2{color:var(--text);font-size:22px;font-weight:bold;}
+        .status-bar{text-align:center;color:#56ab2f;font-size:11px;padding:4px;background:rgba(86,171,47,0.1);border-bottom:1px solid rgba(86,171,47,0.2);}
+        .dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+        .dash-card{background:var(--card);border-radius:14px;padding:20px;text-align:center;border:1px solid var(--card-border);transition:transform 0.2s;}
+        .dash-card:hover{transform:translateY(-2px);}
+        .dash-card h2{font-size:32px;margin-bottom:4px;}
+        .dash-card p{color:var(--text-muted);font-size:12px;}
+        .dash-card.total h2{color:#f7971e;}
+        .dash-card.pending h2{color:#ffd200;}
+        .dash-card.progress h2{color:#4fc3f7;}
+        .dash-card.resolved h2{color:#56ab2f;}
+        .welcome-card{background:linear-gradient(135deg,rgba(247,151,30,0.2),rgba(255,210,0,0.1));border:1px solid rgba(247,151,30,0.3);border-radius:16px;padding:20px 25px;margin-bottom:20px;display:flex;align-items:center;gap:15px;}
+        .welcome-icon{font-size:40px;}
+        .welcome-text h3{color:#f7971e;font-size:18px;margin-bottom:4px;}
+        .welcome-text p{color:var(--text-muted);font-size:13px;}
+        .quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+        .quick-action{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;}
+        .quick-action:hover{transform:translateY(-2px);border-color:#f7971e;}
+        .quick-action .qa-icon{font-size:28px;margin-bottom:8px;}
+        .quick-action p{color:var(--text-muted);font-size:12px;}
+        .quick-action h4{color:var(--text);font-size:13px;margin-bottom:4px;}
+        .section-title{color:var(--text);font-size:18px;margin-bottom:15px;font-weight:bold;}
+        .form-box{background:var(--card);border-radius:15px;padding:25px;border:1px solid var(--card-border);margin-bottom:20px;}
+        .form-box h3{color:#f7971e;margin-bottom:18px;font-size:17px;}
+        .form-box input,.form-box select,.form-box textarea{width:100%;padding:12px;margin-bottom:12px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;}
+        .form-box textarea{height:80px;resize:none;}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;}
+        .btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
+        .complaint-card{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:12px;border:1px solid var(--card-border);border-left:4px solid #f7971e;transition:transform 0.2s;}
+        .complaint-card:hover{transform:translateX(3px);}
+        .complaint-card h4{color:var(--text);font-size:15px;margin-bottom:5px;}
+        .complaint-card p{color:var(--text-muted);font-size:13px;margin-bottom:3px;}
+        .status-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:bold;margin-top:6px;}
+        .status-Pending{background:rgba(255,210,0,0.2);color:#ffd200;}
+        .status-Progress{background:rgba(79,195,247,0.2);color:#4fc3f7;}
+        .status-Resolved{background:rgba(86,171,47,0.2);color:#56ab2f;}
+        .card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+        .btn-action{padding:6px 12px;border:none;border-radius:7px;cursor:pointer;font-size:12px;color:white;}
+        .btn-progress{background:#4fc3f7;color:#1a1a1a;}
+        .btn-resolve{background:#56ab2f;}
+        .btn-del{background:#e94560;}
+        .btn-print{background:#9c27b0;}
+        .btn-feedback{background:#ff9800;}
+        .btn-translate-comp{background:#2196f3;}
+        .translated-box{background:rgba(33,150,243,0.1);border-radius:8px;padding:10px;margin-top:8px;border-left:3px solid #2196f3;}
+        .translated-box .trans-label{color:#4fc3f7;font-size:12px;margin-bottom:4px;}
+        .translated-box .trans-text{color:var(--text);font-size:13px;}
+        .original-box{background:rgba(255,152,0,0.08);border-radius:6px;padding:8px;margin-top:5px;border-left:2px solid #ff9800;}
+        .original-box p{color:#ff9800;font-size:11px;margin-bottom:3px;}
+        .original-box span{color:var(--text-muted);font-size:12px;}
+        .dept-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(156,39,176,0.2);color:#ce93d8;margin-left:8px;}
+        .feedback-box{background:var(--input-bg);border-radius:8px;padding:10px;margin-top:8px;}
+        .feedback-box p{color:var(--text-muted);font-size:13px;}
+        .profile-card{background:var(--card);border-radius:15px;padding:30px;border:1px solid var(--card-border);text-align:center;margin-bottom:20px;}
+        .profile-avatar-big{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#f7971e,#ffd200);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 15px;box-shadow:0 6px 20px rgba(247,151,30,0.4);}
+        .profile-card h3{color:#f7971e;font-size:22px;margin-bottom:5px;}
+        .profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;}
+        .profile-stat{background:var(--input-bg);border-radius:10px;padding:15px;text-align:center;}
+        .profile-stat h3{color:#f7971e;font-size:22px;}
+        .profile-stat p{color:var(--text-muted);font-size:12px;}
+        .profile-details{background:var(--card);border-radius:15px;padding:20px;border:1px solid var(--card-border);}
+        .profile-detail-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--card-border);}
+        .profile-detail-item:last-child{border-bottom:none;}
+        .profile-detail-icon{font-size:20px;width:30px;text-align:center;}
+        .profile-detail-label{color:var(--text-muted);font-size:12px;}
+        .profile-detail-value{color:var(--text);font-size:14px;font-weight:500;}
+        .btn-logout-profile{width:100%;margin-top:20px;padding:13px;background:#e94560;color:white;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;}
+        .notif-item{background:var(--card);border-radius:10px;padding:13px 15px;margin-bottom:10px;border-left:3px solid #4fc3f7;}
+        .notif-item p{color:var(--text);font-size:13px;}
+        .notif-item span{color:var(--text-muted);font-size:11px;}
+        .alert-popup{position:fixed;top:75px;right:20px;z-index:9999;max-width:320px;}
+        .alert-card{background:var(--bg2);border-radius:12px;padding:15px;margin-bottom:8px;border:1px solid var(--card-border);box-shadow:0 8px 25px rgba(0,0,0,0.3);display:flex;gap:12px;align-items:flex-start;animation:slideIn 0.3s ease;}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+        .alert-icon{font-size:22px;}
+        .alert-content h4{color:var(--text);font-size:13px;margin-bottom:3px;}
+        .alert-content p{color:var(--text-muted);font-size:12px;}
+        .alert-close{margin-left:auto;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;}
+        .img-preview{max-width:100%;border-radius:8px;margin-top:8px;max-height:150px;object-fit:cover;}
+        .location-wrap{position:relative;margin-bottom:12px;}
+        .location-wrap input{margin-bottom:0;padding-right:90px;}
+        .btn-live-loc{position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:5px 10px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;}
+        .btn-live-loc:disabled{opacity:0.6;cursor:not-allowed;}
+        .map-container{display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;border:2px solid #f7971e;}
+        #satelliteMap{height:280px;width:100%;}
+        .map-toggle{display:flex;gap:8px;margin-bottom:8px;padding:8px;}
+        .map-toggle button{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;}
+        .map-btn-sat{background:#f7971e;color:#1a1a1a;}
+        .map-btn-street{background:rgba(255,255,255,0.15);color:var(--text);}
+        .accuracy-badge{display:inline-block;padding:4px 12px;background:rgba(86,171,47,0.2);color:#56ab2f;border-radius:20px;font-size:12px;margin-bottom:8px;}
+        .translator-box{background:var(--card);border-radius:15px;padding:25px;border:1px solid var(--card-border);margin-bottom:20px;}
+        .translator-box h3{color:#f7971e;margin-bottom:18px;font-size:17px;}
+        .btn-translate{width:100%;padding:12px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;margin-top:10px;}
+        .btn-translate:disabled{opacity:0.6;cursor:not-allowed;}
+        .trans-status{text-align:center;font-size:12px;color:#4fc3f7;margin-top:5px;min-height:18px;}
+        .submit-loading{text-align:center;color:#f7971e;font-size:13px;margin-top:8px;display:none;}
+        .search-filter{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px;}
+        .search-filter input,.search-filter select{padding:9px 13px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);outline:none;font-size:13px;}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center;}
+        .modal.open{display:flex;}
+        .modal-box{background:var(--bg2);border-radius:15px;padding:25px;width:90%;max-width:400px;border:1px solid var(--card-border);}
+        .modal-box h3{color:#f7971e;margin-bottom:15px;}
+        .modal-box textarea{width:100%;padding:10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);height:80px;outline:none;margin-bottom:10px;font-size:14px;}
+        .star-rating{display:flex;gap:8px;margin-bottom:15px;}
+        .star{font-size:28px;cursor:pointer;color:#555;}
+        .star.active{color:#ffd200;}
+        .modal-btns{display:flex;gap:10px;}
+        .btn-cancel{flex:1;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;}
+        .btn-confirm{flex:1;padding:10px;background:#f7971e;color:#1a1a1a;border:none;border-radius:8px;font-weight:bold;cursor:pointer;}
+        .empty-msg{text-align:center;color:var(--text-muted);padding:40px;}
+        select option{background:#1a1a2e;color:white;}
+        .priority-High{border-left-color:#e94560 !important;}
+        .priority-Medium{border-left-color:#f7971e !important;}
+        .priority-Low{border-left-color:#56ab2f !important;}
+        @media(max-width:600px){.features-grid{grid-template-columns:repeat(2,1fr);}.stats-grid{grid-template-columns:repeat(2,1fr);}.steps-grid{grid-template-columns:repeat(2,1fr);}.dash-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.quick-actions{grid-template-columns:repeat(2,1fr);}}
+    </style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="homePage">
+    <nav class="home-nav">
+        <div class="home-nav-left">
+            <button class="home-hamburger" onclick="toggleHomeSidebar()">☰</button>
+            <div class="home-logo">🏛️</div>
+            <span class="home-nav-title">Smart Complaint System</span>
+        </div>
+        <div class="home-nav-right">
+            <div class="theme-wrap">
+                <span id="homeThemeIcon" style="font-size:16px;">🌙</span>
+                <label class="theme-toggle"><input type="checkbox" id="homeThemeToggle" onchange="toggleTheme()"><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            </div>
+            <button class="btn-login-nav" id="homeLoginBtn" onclick="goToLogin()">🔐 Login</button>
+        </div>
+    </nav>
+    <div class="sidebar-overlay" id="homeSidebarOverlay" onclick="closeHomeSidebar()"></div>
+    <div class="home-sidebar" id="homeSidebar">
+        <div class="home-sidebar-info"><h3>🏛️ Smart Complaint System</h3><p>AI-Powered Citizen Service Platform with Firebase Cloud</p></div>
+        <div class="home-sidebar-menu">
+            <div class="home-menu-item clickable" onclick="goToLogin()"><span>🔐</span><span>Login / Register</span></div>
+            <div class="home-menu-item locked"><span>📊</span><span>Dashboard</span><span class="lock-icon">🔒</span></div>
+            <div class="home-menu-item locked"><span>📋</span><span>Complaints</span><span class="lock-icon">🔒</span></div>
+            <div class="home-menu-item locked"><span>➕</span><span>Submit Complaint</span><span class="lock-icon">🔒</span></div>
+            <div class="home-menu-item locked"><span>🌐</span><span>AI Translate</span><span class="lock-icon">🔒</span></div>
+            <div class="home-menu-item locked"><span>🔔</span><span>Notifications</span><span class="lock-icon">🔒</span></div>
+        </div>
+    </div>
+    <div class="home-content">
+        <div class="hero-section">
+            <div class="gov-logo">🏛️</div>
+            <div class="gov-title">Government of Tamil Nadu</div>
+            <div class="gov-title" style="color:rgba(255,255,255,0.6);margin-top:3px;">Department of Public Services</div>
+            <h1 class="app-name" style="margin-top:15px;">Smart Complaint & Service Request System</h1>
+            <p class="app-tagline">AI-Powered • Multilingual • Real-time • Satellite GPS • Firebase Cloud</p>
+            <button class="hero-btn" onclick="goToLogin()">🚀 Get Started - Login / Register</button>
+        </div>
+        <div class="features-section">
+            <h2 class="features-title">Why Choose Our Platform?</h2>
+            <p class="features-sub">Complete digital solution for citizen grievance redressal</p>
+            <div class="features-grid">
+                <div class="feature-card"><div class="feature-icon">🤖</div><h4>AI Translation</h4><p>5 Indian languages with auto-translate</p></div>
+                <div class="feature-card"><div class="feature-icon">🛰️</div><h4>Satellite GPS</h4><p>Exact location with satellite maps</p></div>
+                <div class="feature-card"><div class="feature-icon">☁️</div><h4>Firebase Cloud</h4><p>Real-time sync across all devices</p></div>
+                <div class="feature-card"><div class="feature-icon">🔔</div><h4>Smart Alerts</h4><p>Email & SMS simulation notifications</p></div>
+                <div class="feature-card"><div class="feature-icon">📊</div><h4>Live Dashboard</h4><p>Real-time complaint tracking</p></div>
+                <div class="feature-card"><div class="feature-icon">🖨️</div><h4>Print Reports</h4><p>Official complaint reports</p></div>
+            </div>
+        </div>
+        <div class="stats-section">
+            <div class="stats-title">📈 Platform Statistics</div>
+            <div class="stats-grid">
+                <div class="stat-item"><div class="stat-num">5000+</div><div class="stat-label">Complaints Resolved</div></div>
+                <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Languages Supported</div></div>
+                <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Service Available</div></div>
+                <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Satisfaction Rate</div></div>
+            </div>
+        </div>
+        <div class="how-section">
+            <h2 class="how-title">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card"><div class="step-num">1</div><h4>Register</h4><p>Create citizen account</p></div>
+                <div class="step-card"><div class="step-num">2</div><h4>Submit</h4><p>File complaint with GPS</p></div>
+                <div class="step-card"><div class="step-num">3</div><h4>Track</h4><p>Monitor real-time status</p></div>
+                <div class="step-card"><div class="step-num">4</div><h4>Resolved</h4><p>Get notified & give feedback</p></div>
+            </div>
+        </div>
+        <div class="home-footer"><p>🏛️ Smart Complaint & Service Request Management System | ☁️ Firebase Cloud | 🤖 AI Enabled | © 2026 Government of Tamil Nadu</p></div>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<div class="auth-container" id="loginPage" style="display:none">
+    <div class="auth-box">
+        <h2 id="loginTitle">🔐 Smart Complaint System</h2>
+        <div style="margin-bottom:15px;">
+            <p style="color:var(--text-muted);font-size:12px;text-align:center;margin-bottom:8px;">🌐 Select Language</p>
+            <div class="lang-selector">
+                <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
+                <button class="lang-btn" onclick="setLang('ta')">தமிழ்</button>
+                <button class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+                <button class="lang-btn" onclick="setLang('te')">తెలుగు</button>
+                <button class="lang-btn" onclick="setLang('ml')">മലയാളം</button>
+            </div>
+        </div>
+        <input type="text" id="loginUser" placeholder="Username"/>
+        <input type="password" id="loginPass" placeholder="Password"/>
+        <select id="loginRole"><option value="citizen" id="optCitizen">Citizen</option><option value="admin" id="optAdmin">Admin</option></select>
+        <button class="btn-primary" id="btnLogin" onclick="login()">LOGIN</button>
+        <button class="btn-link" id="btnRegisterLink" onclick="showRegister()">New User? Register Here</button>
+        <button class="btn-link" onclick="showHome()" style="margin-top:8px;color:var(--text-muted);border-color:var(--card-border);">← Back to Home</button>
+    </div>
+</div>
+
+<!-- REGISTER -->
+<div class="auth-container" id="registerPage" style="display:none">
+    <div class="auth-box">
+        <h2 id="registerTitle">📝 Citizen Registration</h2>
+        <input type="text" id="regName" placeholder="Full Name"/>
+        <input type="text" id="regUser" placeholder="Username"/>
+        <input type="password" id="regPass" placeholder="Password"/>
+        <input type="text" id="regPhone" placeholder="Phone Number"/>
+        <input type="email" id="regEmail" placeholder="Email Address"/>
+        <input type="text" id="regAddress" placeholder="Address"/>
+        <button class="btn-primary" id="btnRegister" onclick="register()">REGISTER</button>
+        <button class="btn-link" id="btnLoginLink" onclick="showLogin()">Already registered? Login</button>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-container" id="mainApp">
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <div><span class="nav-title">🏛️ Smart Complaint System</span><span class="ai-badge">🤖 AI</span><span class="firebase-badge">☁️ Firebase</span></div>
+        </div>
+        <div class="nav-right">
+            <div class="theme-wrap" style="display:flex;align-items:center;gap:6px;">
+                <span id="appThemeIcon" style="font-size:16px;">🌙</span>
+                <label class="theme-toggle"><input type="checkbox" id="appThemeToggle" onchange="toggleTheme()"><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            </div>
+            <span class="nav-user" id="navUser"></span>
+            <button class="btn-logout-top" id="btnLogout" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar">👤</div>
+            <div class="sidebar-name" id="sidebarName">User</div>
+            <div class="sidebar-role" id="sidebarRole">Citizen</div>
+            <div class="sidebar-stats">
+                <div class="sidebar-stat"><h4 id="sbTotal">0</h4><p>Total</p></div>
+                <div class="sidebar-stat"><h4 id="sbPending">0</h4><p>Pending</p></div>
+                <div class="sidebar-stat"><h4 id="sbResolved">0</h4><p>Resolved</p></div>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" id="menuDashboard" onclick="showPage('dashboard');closeSidebar();"><span class="menu-icon">📊</span><span id="menuDashText">Dashboard</span></div>
+            <div class="menu-item" id="menuComplaints" onclick="showPage('complaints');closeSidebar();"><span class="menu-icon">📋</span><span id="menuCompText">Complaints</span><span class="menu-badge" id="pendingBadge">0</span></div>
+            <div class="menu-item" id="menuSubmit" onclick="showPage('submit');closeSidebar();"><span class="menu-icon">➕</span><span id="menuSubmitText">Submit Complaint</span></div>
+            <div class="menu-item" id="menuTranslator" onclick="showPage('translator');closeSidebar();"><span class="menu-icon">🌐</span><span id="menuTransText">AI Translate</span></div>
+            <div class="menu-item" id="menuNotifications" onclick="showPage('notifications');closeSidebar();"><span class="menu-icon">🔔</span><span id="menuNotifText">Notifications</span><span class="menu-badge" id="notifBadge">0</span></div>
+            <div class="menu-item" id="menuProfile" onclick="showPage('profile');closeSidebar();"><span class="menu-icon">👤</span><span id="menuProfileText">Profile</span></div>
+        </div>
+    </div>
+    <div class="status-bar">🟢 <span id="dbStatusText">Connected to Firebase Cloud</span> | 🤖 AI Active | 🛰️ Satellite Maps | 🌐 <span id="activeLangBar">English</span></div>
+    <div class="main-content">
+
+        <!-- DASHBOARD -->
+        <div class="page active" id="dashboard">
+            <div class="welcome-card"><div class="welcome-icon">👋</div><div class="welcome-text"><h3 id="welcomeText">Welcome back!</h3><p id="welcomeSubText">Real-time Firebase powered complaint management</p></div></div>
+            <div class="dash-grid">
+                <div class="dash-card total"><h2 id="dTotal">0</h2><p id="dTotalLabel">Total</p></div>
+                <div class="dash-card pending"><h2 id="dPending">0</h2><p id="dPendingLabel">Pending</p></div>
+                <div class="dash-card progress"><h2 id="dProgress">0</h2><p id="dProgressLabel">In Progress</p></div>
+                <div class="dash-card resolved"><h2 id="dResolved">0</h2><p id="dResolvedLabel">Resolved</p></div>
+            </div>
+            <div class="quick-actions" id="quickActions">
+                <div class="quick-action" onclick="showPage('submit');closeSidebar();"><div class="qa-icon">📝</div><h4 id="qaSubmit">Submit Complaint</h4><p>File a new complaint</p></div>
+                <div class="quick-action" onclick="showPage('complaints');closeSidebar();"><div class="qa-icon">📋</div><h4 id="qaView">View Complaints</h4><p>Track your complaints</p></div>
+                <div class="quick-action" onclick="showPage('translator');closeSidebar();"><div class="qa-icon">🌐</div><h4 id="qaTranslate">AI Translate</h4><p>Multilingual support</p></div>
+            </div>
+            <h3 class="section-title" id="recentTitle">🕐 Recent Complaints</h3>
+            <div id="recentList"></div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="page" id="submit">
+            <div class="page-header"><h2 id="submitFormTitle">📋 Submit New Complaint</h2></div>
+            <div class="form-box">
+                <div class="form-grid">
+                    <input type="text" id="compTitle" placeholder="Complaint Title"/>
+                    <select id="compCategory">
+                        <option value="Road">🛣️ Road Issue</option>
+                        <option value="Water">💧 Water Supply</option>
+                        <option value="Electricity">⚡ Electricity</option>
+                        <option value="Sanitation">🧹 Sanitation</option>
+                        <option value="Service Request">📝 Service Request</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                    <div class="location-wrap">
+                        <input type="text" id="compLocation" placeholder="Location / Address"/>
+                        <button type="button" class="btn-live-loc" id="livLocBtn" onclick="getLocation()">📍 Live</button>
+                    </div>
+                    <select id="compPriority">
+                        <option value="High">🔴 High Priority</option>
+                        <option value="Medium">🟡 Medium Priority</option>
+                        <option value="Low">🟢 Low Priority</option>
+                    </select>
+                    <select id="compDept">
+                        <option value="Public Works">🏗️ Public Works</option>
+                        <option value="Water Board">💧 Water Board</option>
+                        <option value="Electricity Board">⚡ Electricity Board</option>
+                        <option value="Municipal">🏛️ Municipal Corp</option>
+                        <option value="Health">🏥 Health Dept</option>
+                    </select>
+                    <input type="text" id="compContact" placeholder="Contact Number"/>
+                </div>
+                <div id="accuracyDiv" style="display:none;margin-bottom:8px;"><span class="accuracy-badge" id="accuracyText">🛰️ GPS: detecting...</span></div>
+                <div class="map-container" id="mapContainer">
+                    <div class="map-toggle">
+                        <button class="map-btn-sat" onclick="switchLayer('satellite')">🛰️ Satellite</button>
+                        <button class="map-btn-street" onclick="switchLayer('street')">🗺️ Street</button>
+                    </div>
+                    <div id="satelliteMap"></div>
+                </div>
+                <textarea id="compDesc" placeholder="Describe your complaint in detail..."></textarea>
+                <input type="file" id="compImage" accept="image/*" onchange="previewImage()" style="color:var(--text);margin-bottom:12px;"/>
+                <img id="imgPreview" class="img-preview" style="display:none;"/>
+                <button class="btn-submit" id="btnSubmitComp" onclick="submitComplaint()">SUBMIT COMPLAINT 🚀</button>
+                <p class="submit-loading" id="submitLoading">🔄 Processing...</p>
+            </div>
+        </div>
+
+        <!-- COMPLAINTS -->
+        <div class="page" id="complaints">
+            <div class="page-header"><h2 id="allCompTitle">📋 All Complaints</h2></div>
+            <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="🔍 Search..." onkeyup="searchComplaints()" style="width:200px;"/>
+                <select id="filterStatus" onchange="filterComplaints()">
+                    <option value="All">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <div id="complaintsList"></div>
+        </div>
+
+        <!-- AI TRANSLATOR -->
+        <div class="page" id="translator">
+            <div class="page-header"><h2>🌐 AI Language Translator</h2></div>
+            <div class="translator-box">
+                <h3><span id="transTitle">App Language</span></h3>
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:15px;" id="transDesc">Select language to change entire app</p>
+                <div class="lang-selector" style="justify-content:flex-start;gap:10px;">
+                    <button class="lang-btn" onclick="setAppLang('en')" id="appLangEn">🇬🇧 English</button>
+                    <button class="lang-btn" onclick="setAppLang('ta')" id="appLangTa">🇮🇳 தமிழ்</button>
+                    <button class="lang-btn" onclick="setAppLang('hi')" id="appLangHi">🇮🇳 हिंदी</button>
+                    <button class="lang-btn" onclick="setAppLang('te')" id="appLangTe">🇮🇳 తెలుగు</button>
+                    <button class="lang-btn" onclick="setAppLang('ml')" id="appLangMl">🇮🇳 മലയാളം</button>
+                </div>
+                <div id="langChangeMsg" style="display:none;margin-top:15px;padding:12px;background:rgba(86,171,47,0.2);border-radius:8px;color:#56ab2f;font-size:13px;"></div>
+            </div>
+            <div class="translator-box" id="quickTransBox">
+                <h3 id="quickTransTitle">📋 Quick Translator</h3>
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:15px;" id="quickTransDesc">Type in your language → Translate to English</p>
+                <textarea id="quickInput" placeholder="Type here..." style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);height:100px;outline:none;font-size:14px;resize:none;margin-bottom:12px;"></textarea>
+                <select id="quickFromLang" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);margin-bottom:12px;outline:none;">
+                    <option value="ta">From Tamil</option>
+                    <option value="hi">From Hindi</option>
+                    <option value="te">From Telugu</option>
+                    <option value="ml">From Malayalam</option>
+                </select>
+                <button class="btn-translate" id="btnQuickTrans" onclick="quickTranslate()">⚡ TRANSLATE TO ENGLISH</button>
+                <p class="trans-status" id="transStatus"></p>
+                <div id="quickResult" style="margin-top:10px;display:none;">
+                    <p style="color:#56ab2f;font-size:13px;margin-bottom:8px;" id="transResultLabel">✅ Translated:</p>
+                    <textarea id="quickOutput" readonly style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);height:80px;outline:none;font-size:14px;resize:none;"></textarea>
+                    <button id="btnCopyComp" onclick="copyToComplaint()" style="margin-top:8px;padding:8px 16px;background:#56ab2f;color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;">📋 Copy to Form</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="page" id="notifications">
+            <div class="page-header"><h2 id="notifTitle">🔔 Notifications</h2></div>
+            <div id="notifList"></div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="page" id="profile">
+            <div class="page-header"><h2>👤 My Profile</h2></div>
+            <div class="profile-card">
+                <div class="profile-avatar-big">👤</div>
+                <h3 id="profileName"></h3>
+                <p id="profileRoleText" style="color:#f7971e;font-weight:bold;"></p>
+                <div class="profile-stats">
+                    <div class="profile-stat"><h3 id="pTotal">0</h3><p id="pTotalLabel">Total</p></div>
+                    <div class="profile-stat"><h3 id="pPending">0</h3><p id="pPendingLabel">Pending</p></div>
+                    <div class="profile-stat"><h3 id="pResolved">0</h3><p id="pResolvedLabel">Resolved</p></div>
+                </div>
+            </div>
+            <div class="profile-details">
+                <div class="profile-detail-item"><div class="profile-detail-icon">👤</div><div><div class="profile-detail-label">Username</div><div class="profile-detail-value" id="profileUsername"></div></div></div>
+                <div class="profile-detail-item"><div class="profile-detail-icon">📞</div><div><div class="profile-detail-label">Phone</div><div class="profile-detail-value" id="profilePhone"></div></div></div>
+                <div class="profile-detail-item"><div class="profile-detail-icon">📧</div><div><div class="profile-detail-label">Email</div><div class="profile-detail-value" id="profileEmail"></div></div></div>
+                <div class="profile-detail-item"><div class="profile-detail-icon">📍</div><div><div class="profile-detail-label">Address</div><div class="profile-detail-value" id="profileAddress"></div></div></div>
+                <div class="profile-detail-item"><div class="profile-detail-icon">🎭</div><div><div class="profile-detail-label">Role</div><div class="profile-detail-value" id="profileRole"></div></div></div>
+            </div>
+            <button class="btn-logout-profile" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+</div>
+
+<div id="alertContainer" class="alert-popup"></div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal" id="feedbackModal">
+    <div class="modal-box">
+        <h3 id="feedbackTitle">⭐ Rate & Feedback</h3>
+        <div class="star-rating">
+            <span class="star" onclick="setRating(1)">★</span><span class="star" onclick="setRating(2)">★</span>
+            <span class="star" onclick="setRating(3)">★</span><span class="star" onclick="setRating(4)">★</span>
+            <span class="star" onclick="setRating(5)">★</span>
+        </div>
+        <textarea id="feedbackText" placeholder="Write your feedback..."></textarea>
+        <div class="modal-btns">
+            <button class="btn-cancel" id="btnCancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-confirm" id="btnConfirm" onclick="submitFeedback()">Submit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== FIREBASE ==========
+const firebaseConfig = {
+    apiKey:"AIzaSyALnVyNFHs9G5caA35v68EZXliSxbwnojQ",
+    authDomain:"smart-complaint-system-e9220.firebaseapp.com",
+    databaseURL:"https://smart-complaint-system-e9220-default-rtdb.firebaseio.com",
+    projectId:"smart-complaint-system-e9220",
+    storageBucket:"smart-complaint-system-e9220.firebasestorage.app",
+    messagingSenderId:"747799721892",
+    appId:"1:747799721892:web:f805e5d6c682e337f73331"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ========== STATE ==========
+let currentUser=null, complaints=[], notifications=[], selectedRating=0;
+let feedbackComplaintId=null, currentLang='en';
+let leafletMap=null, currentMarker=null, satelliteLayer=null, streetLayer=null;
+
+// ========== FIREBASE INIT ==========
+async function initAdminUser(){
+    const snap=await db.ref('users').orderByChild('username').equalTo('admin').once('value');
+    if(!snap.exists()){
+        await db.ref('users').push({username:'admin',password:'admin123',role:'admin',name:'Administrator',phone:'9999999999',email:'admin@gov.in',address:'Government Office',lang:'en'});
+    }
+}
+
+function initFirebaseListeners(){
+    db.ref('complaints').on('value',snap=>{
+        complaints=[];
+        snap.forEach(child=>{ complaints.unshift({...child.val(),firebaseKey:child.key}); });
+        if(currentUser){ updateDashboard(); if(document.getElementById('complaints').classList.contains('active')) renderComplaints(complaints); }
+    });
+    db.ref('notifications').on('value',snap=>{
+        notifications=[];
+        snap.forEach(child=>{ notifications.unshift({...child.val(),firebaseKey:child.key}); });
+        if(currentUser){ renderNotifications(); updateBadges(); }
+    });
+}
+
+// ========== ALERT POPUP ==========
+function showAlert(icon,title,message,color='#f7971e'){
+    const container=document.getElementById('alertContainer');
+    const id='alert_'+Date.now();
+    const div=document.createElement('div');
+    div.id=id;
+    div.innerHTML=`<div class="alert-card" style="border-left:3px solid ${color};"><div class="alert-icon">${icon}</div><div class="alert-content"><h4>${title}</h4><p>${message}</p></div><button class="alert-close" onclick="document.getElementById('${id}').remove()">✕</button></div>`;
+    container.appendChild(div);
+    setTimeout(()=>{if(document.getElementById(id))document.getElementById(id).remove();},5000);
+}
+
+// ========== TRANSLATIONS ==========
+const T={
+    en:{loginTitle:'🔐 Smart Complaint System',loginBtn:'LOGIN',registerLink:'New User? Register Here',citizen:'Citizen',admin:'Admin',regTitle:'📝 Citizen Registration',regBtn:'REGISTER',loginLink:'Already registered? Login',tabDash:'Dashboard',tabComp:'Complaints',tabSubmit:'Submit Complaint',tabTrans:'AI Translate',tabAlerts:'Notifications',tabProfile:'Profile',logout:'Logout',dbStatus:'Connected to Firebase Cloud',langBar:'English',totalLabel:'Total',pendingLabel:'Pending',progressLabel:'In Progress',resolvedLabel:'Resolved',recentTitle:'🕐 Recent Complaints',submitFormTitle:'📋 Submit New Complaint',compTitlePh:'Complaint Title',locationPh:'Location / Address',contactPh:'Contact Number',descPh:'Describe your complaint...',submitBtn:'SUBMIT COMPLAINT 🚀',allCompTitle:'📋 All Complaints',transTitle:'App Language',transDesc:'Select language to change entire app',quickTransTitle:'📋 Quick Translator',quickTransDesc:'Type in your language → Translate to English',quickTransBtn:'⚡ TRANSLATE TO ENGLISH',transResultLabel:'✅ Translated:',copyBtn:'📋 Copy to Form',notifTitle:'🔔 Notifications',feedbackTitle:'⭐ Rate & Feedback',cancelBtn:'Cancel',confirmBtn:'Submit',noComplaints:'No complaints yet!',noNotif:'No notifications!',pTotalLabel:'Total',pPendingLabel:'Pending',pResolvedLabel:'Resolved',liveLocBtn:'📍 Live',translateBtn:'🌐 Translate',translatedLabel:'🌐 Translated:',originalLabel:'📝 Original',welcomeText:'Welcome back!',welcomeSub:'Real-time Firebase powered management',qaSubmit:'Submit Complaint',qaView:'View Complaints',qaTranslate:'AI Translate'},
+    ta:{loginTitle:'🔐 புகார் மேலாண்மை அமைப்பு',loginBtn:'உள்நுழை',registerLink:'புதிய பயனர்? பதிவு செய்யுங்கள்',citizen:'குடிமகன்',admin:'நிர்வாகி',regTitle:'📝 குடிமகன் பதிவு',regBtn:'பதிவு செய்',loginLink:'ஏற்கனவே பதிவு? உள்நுழைய',tabDash:'டாஷ்போர்டு',tabComp:'புகார்கள்',tabSubmit:'புகார் சமர்ப்பி',tabTrans:'மொழிபெயர்ப்பு',tabAlerts:'அறிவிப்புகள்',tabProfile:'சுயவிவரம்',logout:'வெளியேறு',dbStatus:'Firebase Cloud இணைக்கப்பட்டது',langBar:'தமிழ்',totalLabel:'மொத்தம்',pendingLabel:'நிலுவையில்',progressLabel:'செயல்பாட்டில்',resolvedLabel:'தீர்க்கப்பட்டது',recentTitle:'🕐 சமீபத்திய புகார்கள்',submitFormTitle:'📋 புதிய புகாரை சமர்ப்பிக்கவும்',compTitlePh:'புகாரின் தலைப்பு',locationPh:'இடம் / முகவரி',contactPh:'தொடர்பு எண்',descPh:'புகாரை விவரிக்கவும்...',submitBtn:'புகாரை சமர்ப்பி 🚀',allCompTitle:'📋 அனைத்து புகார்கள்',transTitle:'செயலி மொழி',transDesc:'மொழியை தேர்ந்தெடுக்கவும்',quickTransTitle:'📋 விரைவு மொழிபெயர்ப்பு',quickTransDesc:'உங்கள் மொழியில் → ஆங்கிலம்',quickTransBtn:'⚡ ஆங்கிலத்தில் மொழிபெயர்க்கவும்',transResultLabel:'✅ மொழிபெயர்க்கப்பட்டது:',copyBtn:'📋 படிவத்தில் நகலெடு',notifTitle:'🔔 அறிவிப்புகள்',feedbackTitle:'⭐ மதிப்பீடு',cancelBtn:'ரத்து',confirmBtn:'சமர்ப்பி',noComplaints:'புகார்கள் இல்லை!',noNotif:'அறிவிப்புகள் இல்லை!',pTotalLabel:'மொத்தம்',pPendingLabel:'நிலுவை',pResolvedLabel:'தீர்க்கப்பட்டது',liveLocBtn:'📍 நேரடி',translateBtn:'🌐 மொழிபெயர்',translatedLabel:'🌐 மொழிபெயர்க்கப்பட்டது:',originalLabel:'📝 அசல்',welcomeText:'வணக்கம்!',welcomeSub:'Firebase Cloud நேரடி மேலாண்மை',qaSubmit:'புகார் சமர்ப்பி',qaView:'புகார்கள் பார்',qaTranslate:'மொழிபெயர்ப்பு'},
+    hi:{loginTitle:'🔐 स्मार्ट शिकायत प्रणाली',loginBtn:'लॉगिन',registerLink:'नए उपयोगकर्ता? पंजीकरण करें',citizen:'नागरिक',admin:'प्रशासक',regTitle:'📝 नागरिक पंजीकरण',regBtn:'पंजीकरण करें',loginLink:'पहले से पंजीकृत? लॉगिन',tabDash:'डैशबोर्ड',tabComp:'शिकायतें',tabSubmit:'शिकायत दर्ज',tabTrans:'अनुवाद',tabAlerts:'सूचनाएं',tabProfile:'प्रोफ़ाइल',logout:'लॉगआउट',dbStatus:'Firebase Cloud से जुड़ा',langBar:'हिंदी',totalLabel:'कुल',pendingLabel:'लंबित',progressLabel:'प्रक्रिया में',resolvedLabel:'हल किया',recentTitle:'🕐 हालिया शिकायतें',submitFormTitle:'📋 नई शिकायत',compTitlePh:'शिकायत शीर्षक',locationPh:'स्थान / पता',contactPh:'संपर्क नंबर',descPh:'शिकायत विस्तार से बताएं...',submitBtn:'शिकायत दर्ज करें 🚀',allCompTitle:'📋 सभी शिकायतें',transTitle:'ऐप भाषा',transDesc:'भाषा चुनें',quickTransTitle:'📋 त्वरित अनुवाद',quickTransDesc:'अपनी भाषा में → अंग्रेजी',quickTransBtn:'⚡ अंग्रेजी में अनुवाद करें',transResultLabel:'✅ अनुवादित:',copyBtn:'📋 फ़ॉर्म में कॉपी',notifTitle:'🔔 सूचनाएं',feedbackTitle:'⭐ रेटिंग',cancelBtn:'रद्द',confirmBtn:'जमा',noComplaints:'कोई शिकायत नहीं!',noNotif:'कोई सूचना नहीं!',pTotalLabel:'कुल',pPendingLabel:'लंबित',pResolvedLabel:'हल किया',liveLocBtn:'📍 लाइव',translateBtn:'🌐 अनुवाद',translatedLabel:'🌐 अनुवादित:',originalLabel:'📝 मूल',welcomeText:'स्वागत है!',welcomeSub:'Firebase Cloud रियल-टाइम प्रबंधन',qaSubmit:'शिकायत दर्ज',qaView:'शिकायतें देखें',qaTranslate:'अनुवाद'},
+    te:{loginTitle:'🔐 స్మార్ట్ ఫిర్యాదు వ్యవస్థ',loginBtn:'లాగిన్',registerLink:'కొత్త వినియోగదారుడా? నమోదు చేయండి',citizen:'పౌరుడు',admin:'నిర్వాహకుడు',regTitle:'📝 పౌర నమోదు',regBtn:'నమోదు చేయండి',loginLink:'ఇప్పటికే నమోదు? లాగిన్',tabDash:'డాష్‌బోర్డ్',tabComp:'ఫిర్యాదులు',tabSubmit:'ఫిర్యాదు సమర్పించు',tabTrans:'అనువాదం',tabAlerts:'నోటిఫికేషన్లు',tabProfile:'ప్రొఫైల్',logout:'లాగ్అవుట్',dbStatus:'Firebase Cloud కనెక్ట్',langBar:'తెలుగు',totalLabel:'మొత్తం',pendingLabel:'పెండింగ్',progressLabel:'పురోగతిలో',resolvedLabel:'పరిష్కరించబడింది',recentTitle:'🕐 ఇటీవలి ఫిర్యాదులు',submitFormTitle:'📋 కొత్త ఫిర్యాదు',compTitlePh:'ఫిర్యాదు శీర్షిక',locationPh:'స్థానం / చిరునామా',contactPh:'సంప్రదింపు నంబర్',descPh:'ఫిర్యాదు వివరించండి...',submitBtn:'ఫిర్యాదు సమర్పించు 🚀',allCompTitle:'📋 అన్ని ఫిర్యాదులు',transTitle:'యాప్ భాష',transDesc:'భాష ఎంచుకోండి',quickTransTitle:'📋 త్వరిత అనువాదం',quickTransDesc:'మీ భాషలో → ఆంగ్లం',quickTransBtn:'⚡ ఆంగ్లంలోకి అనువదించండి',transResultLabel:'✅ అనువదించబడింది:',copyBtn:'📋 ఫారమ్‌కు కాపీ',notifTitle:'🔔 నోటిఫికేషన్లు',feedbackTitle:'⭐ రేటింగ్',cancelBtn:'రద్దు',confirmBtn:'సమర్పించు',noComplaints:'ఫిర్యాదులు లేవు!',noNotif:'నోటిఫికేషన్లు లేవు!',pTotalLabel:'మొత్తం',pPendingLabel:'పెండింగ్',pResolvedLabel:'పరిష్కరించబడింది',liveLocBtn:'📍 లైవ్',translateBtn:'🌐 అనువదించు',translatedLabel:'🌐 అనువదించబడింది:',originalLabel:'📝 అసలైన',welcomeText:'స్వాగతం!',welcomeSub:'Firebase Cloud రియల్-టైమ్ నిర్వహణ',qaSubmit:'ఫిర్యాదు సమర్పించు',qaView:'ఫిర్యాదులు చూడు',qaTranslate:'అనువాదం'},
+    ml:{loginTitle:'🔐 സ്മാർട്ട് പരാതി സംവിധാനം',loginBtn:'ലോഗിൻ',registerLink:'പുതിയ ഉപയോക്താവോ? രജിസ്റ്റർ ചെയ്യൂ',citizen:'പൗരൻ',admin:'അഡ്മിൻ',regTitle:'📝 പൗര രജിസ്ട്രേഷൻ',regBtn:'രജിസ്റ്റർ ചെയ്യൂ',loginLink:'ഇതിനകം രജിസ്റ്റർ ചെയ്തോ? ലോഗിൻ',tabDash:'ഡാഷ്‌ബോർഡ്',tabComp:'പരാതികൾ',tabSubmit:'പരാതി സമർപ്പിക്കൂ',tabTrans:'വിവർത്തനം',tabAlerts:'അറിയിപ്പുകൾ',tabProfile:'പ്രൊഫൈൽ',logout:'ലോഗ്ഔട്ട്',dbStatus:'Firebase Cloud ബന്ധിപ്പിച്ചു',langBar:'മലയാളം',totalLabel:'മൊത്തം',pendingLabel:'തീർപ്പാകാത്തത്',progressLabel:'പ്രക്രിയയിൽ',resolvedLabel:'പരിഹരിച്ചത്',recentTitle:'🕐 സമീപകാല പരാതികൾ',submitFormTitle:'📋 പുതിയ പരാതി',compTitlePh:'പരാതി ശീർഷകം',locationPh:'സ്ഥലം / വിലാസം',contactPh:'ബന്ധപ്പെടാൻ',descPh:'പരാതി വിശദീകരിക്കൂ...',submitBtn:'പരാതി സമർപ്പിക്കൂ 🚀',allCompTitle:'📋 എല്ലാ പരാതികൾ',transTitle:'ആപ്പ് ഭാഷ',transDesc:'ഭാഷ തിരഞ്ഞെടുക്കൂ',quickTransTitle:'📋 ദ്രുത വിവർത്തനം',quickTransDesc:'നിങ്ങളുടെ ഭാഷ → ഇംഗ്ലീഷ്',quickTransBtn:'⚡ ഇംഗ്ലീഷിലേക്ക് വിവർത്തനം',transResultLabel:'✅ വിവർത്തനം:',copyBtn:'📋 ഫോമിലേക്ക് കാപ്പി',notifTitle:'🔔 അറിയിപ്പുകൾ',feedbackTitle:'⭐ റേറ്റിംഗ്',cancelBtn:'റദ്ദ്',confirmBtn:'സമർപ്പിക്കൂ',noComplaints:'പരാതികൾ ഇല്ല!',noNotif:'അറിയിപ്പുകൾ ഇല്ല!',pTotalLabel:'മൊത്തം',pPendingLabel:'തീർപ്പാകാത്തത്',pResolvedLabel:'പരിഹരിച്ചത്',liveLocBtn:'📍 ലൈവ്',translateBtn:'🌐 വിവർത്തനം',translatedLabel:'🌐 വിവർത്തനം:',originalLabel:'📝 യഥാർത്ഥ',welcomeText:'സ്വാഗതം!',welcomeSub:'Firebase Cloud റിയൽ-ടൈം നിർവ്വഹണം',qaSubmit:'പരാതി സമർപ്പിക്കൂ',qaView:'പരാതികൾ കാണൂ',qaTranslate:'വിവർത്തനം'}
+};
+
+function applyLang(lang){
+    currentLang=lang;
+    const t=T[lang];
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+    const ph=(id,val)=>{const el=document.getElementById(id);if(el)el.placeholder=val;};
+    set('loginTitle',t.loginTitle);set('btnLogin',t.loginBtn);set('btnRegisterLink',t.registerLink);
+    set('optCitizen',t.citizen);set('optAdmin',t.admin);set('registerTitle',t.regTitle);
+    set('btnRegister',t.regBtn);set('btnLoginLink',t.loginLink);set('btnLogout',t.logout);
+    set('dbStatusText',t.dbStatus);set('activeLangBar',t.langBar);
+    set('menuDashText',t.tabDash);set('menuCompText',t.tabComp);set('menuSubmitText',t.tabSubmit);
+    set('menuTransText',t.tabTrans);set('menuNotifText',t.tabAlerts);set('menuProfileText',t.tabProfile);
+    set('dTotalLabel',t.totalLabel);set('dPendingLabel',t.pendingLabel);
+    set('dProgressLabel',t.progressLabel);set('dResolvedLabel',t.resolvedLabel);
+    set('recentTitle',t.recentTitle);set('welcomeText',t.welcomeText);set('welcomeSubText',t.welcomeSub);
+    set('qaSubmit',t.qaSubmit);set('qaView',t.qaView);set('qaTranslate',t.qaTranslate);
+    set('submitFormTitle',t.submitFormTitle);set('allCompTitle',t.allCompTitle);
+    set('transTitle',t.transTitle);set('transDesc',t.transDesc);
+    set('quickTransTitle',t.quickTransTitle);set('quickTransDesc',t.quickTransDesc);
+    set('btnQuickTrans',t.quickTransBtn);set('transResultLabel',t.transResultLabel);
+    set('btnCopyComp',t.copyBtn);set('notifTitle',t.notifTitle);
+    set('pTotalLabel',t.pTotalLabel);set('pPendingLabel',t.pPendingLabel);
+    set('pResolvedLabel',t.pResolvedLabel);set('feedbackTitle',t.feedbackTitle);
+    set('btnCancel',t.cancelBtn);set('btnConfirm',t.confirmBtn);
+    ph('compTitle',t.compTitlePh);ph('compLocation',t.locationPh);
+    ph('compContact',t.contactPh);ph('compDesc',t.descPh);
+    set('btnSubmitComp',t.submitBtn);set('livLocBtn',t.liveLocBtn);
+    document.querySelectorAll('.lang-btn').forEach((b,i)=>b.classList.toggle('active',['en','ta','hi','te','ml'][i]===lang));
+    ['en','ta','hi','te','ml'].forEach(l=>{const el=document.getElementById('appLang'+l.charAt(0).toUpperCase()+l.slice(1));if(el)el.classList.toggle('active',l===lang);});
+}
+
+function setLang(lang){applyLang(lang);}
+function setAppLang(lang){
+    applyLang(lang);
+    const msg=document.getElementById('langChangeMsg');
+    msg.textContent='✅ '+T[lang].langBar;msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',3000);
+    if(currentUser){updateDashboard();renderComplaints(complaints);}
+}
+function clearTranslator(){
+    document.getElementById('quickInput').value='';
+    document.getElementById('quickOutput').value='';
+    document.getElementById('quickResult').style.display='none';
+    document.getElementById('transStatus').textContent='';
+}
+
+// NAV
+function goToLogin(){document.getElementById('homePage').style.display='none';document.getElementById('loginPage').style.display='flex';closeHomeSidebar();}
+function showHome(){
+    ['loginPage','registerPage','mainApp'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    document.getElementById('homePage').style.display='block';
+    const btn=document.getElementById('homeLoginBtn');
+    if(currentUser){btn.textContent='🚪 Logout';btn.onclick=logout;}
+    else{btn.textContent='🔐 Login';btn.onclick=goToLogin;}
+}
+function toggleHomeSidebar(){document.getElementById('homeSidebar').classList.toggle('open');document.getElementById('homeSidebarOverlay').classList.toggle('show');}
+function closeHomeSidebar(){document.getElementById('homeSidebar').classList.remove('open');document.getElementById('homeSidebarOverlay').classList.remove('show');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
+function toggleTheme(){
+    const html=document.documentElement;
+    const isDark=html.getAttribute('data-theme')==='dark';
+    html.setAttribute('data-theme',isDark?'light':'dark');
+    document.getElementById('homeThemeToggle').checked=isDark;
+    document.getElementById('appThemeToggle').checked=isDark;
+    document.getElementById('homeThemeIcon').textContent=isDark?'☀️':'🌙';
+    document.getElementById('appThemeIcon').textContent=isDark?'☀️':'🌙';
+}
+
+// ✅ MAP - FIXED
+function initMap(lat,lng){
+    // Destroy old map safely
+    if(leafletMap){
+        try{leafletMap.off();leafletMap.remove();}catch(e){}
+        leafletMap=null;satelliteLayer=null;streetLayer=null;currentMarker=null;
+    }
+    document.getElementById('mapContainer').style.display='block';
+    // Small delay to ensure DOM is ready
+    setTimeout(()=>{
+        try{
+            leafletMap=L.map('satelliteMap',{zoomControl:true,scrollWheelZoom:true}).setView([lat,lng],17);
+            satelliteLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri Satellite',maxZoom:20,tileSize:256});
+            streetLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:20});
+            satelliteLayer.addTo(leafletMap);
+            const redIcon=L.icon({
+                iconUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                shadowUrl:'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]
+            });
+            currentMarker=L.marker([lat,lng],{icon:redIcon}).addTo(leafletMap).bindPopup('📍 Your Location').openPopup();
+            setTimeout(()=>{try{leafletMap.invalidateSize();}catch(e){}},300);
+        }catch(e){console.error('Map init error:',e);}
+    },150);
+}
+
+function switchLayer(type){
+    if(!leafletMap)return;
+    try{
+        if(type==='satellite'){
+            if(streetLayer&&leafletMap.hasLayer(streetLayer))leafletMap.removeLayer(streetLayer);
+            if(satelliteLayer&&!leafletMap.hasLayer(satelliteLayer))satelliteLayer.addTo(leafletMap);
+            document.querySelector('.map-btn-sat').style.background='#f7971e';
+            document.querySelector('.map-btn-sat').style.color='#1a1a1a';
+            document.querySelector('.map-btn-street').style.background='rgba(255,255,255,0.15)';
+        }else{
+            if(satelliteLayer&&leafletMap.hasLayer(satelliteLayer))leafletMap.removeLayer(satelliteLayer);
+            if(streetLayer&&!leafletMap.hasLayer(streetLayer))streetLayer.addTo(leafletMap);
+            document.querySelector('.map-btn-street').style.background='#f7971e';
+            document.querySelector('.map-btn-street').style.color='#1a1a1a';
+            document.querySelector('.map-btn-sat').style.background='rgba(255,255,255,0.15)';
+        }
+    }catch(e){console.error('Switch layer error:',e);}
+}
+
+function getLocation(){
+    if(!navigator.geolocation){alert('Geolocation not supported!');return;}
+    const btn=document.getElementById('livLocBtn');
+    btn.textContent='⏳';btn.disabled=true;
+    navigator.geolocation.getCurrentPosition(
+        pos=>{
+            const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
+            document.getElementById('accuracyText').textContent=`🛰️ GPS: ±${acc}m`;
+            document.getElementById('accuracyDiv').style.display='block';
+            initMap(lat,lng);
+            // Reverse geocode
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1&zoom=18`,{headers:{'Accept-Language':'en-US,en'}})
+            .then(r=>r.json())
+            .then(data=>{
+                const a=data.address;
+                const parts=[
+                    a.house_number?a.house_number+' '+(a.road||''):(a.road||a.pedestrian||a.footway||''),
+                    a.suburb||a.neighbourhood||a.quarter||'',
+                    a.village||a.town||a.city_district||'',
+                    a.city||a.county||'',
+                    a.state_district||'',
+                    a.state||'',
+                    a.postcode||'',
+                    'India'
+                ].filter(x=>x&&x.trim()!=='').join(', ');
+                document.getElementById('compLocation').value=parts;
+                // Update marker popup after map init
+                setTimeout(()=>{try{if(currentMarker)currentMarker.bindPopup(`📍 ${parts}`).openPopup();}catch(e){}},500);
+                btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;
+            })
+            .catch(()=>{
+                document.getElementById('compLocation').value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;
+            });
+        },
+        err=>{
+            let msg='❌ ';
+            if(err.code===1)msg+='Allow location permission!';
+            else if(err.code===2)msg+='Location unavailable!';
+            else msg+='Timeout! Try again.';
+            alert(msg);
+            btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;
+        },
+        {enableHighAccuracy:true,timeout:20000,maximumAge:0}
+    );
+}
+
+// ✅ TRANSLATE API - FIXED WITH 3 APIS
+async function callTranslateAPI(text, from, to){
+    if(!text||!text.trim()||from===to) return text;
+    let translated=null;
+
+    // API 1: Google Translate
+    try{
+        const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`);
+        const data=await res.json();
+        if(data&&data[0]&&Array.isArray(data[0])){
+            const result=data[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
+            if(result&&result.trim()!==''&&result!==text) translated=result;
+        }
+    }catch(e){}
+
+    // API 2: MyMemory
+    if(!translated){
+        try{
+            const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`);
+            const data=await res.json();
+            if(data&&data.responseStatus===200&&data.responseData&&data.responseData.translatedText&&data.responseData.translatedText!==text){
+                translated=data.responseData.translatedText;
+            }
+        }catch(e){}
+    }
+
+    // API 3: Lingva
+    if(!translated){
+        try{
+            const res=await fetch(`https://lingva.ml/api/v1/${from}/${to}/${encodeURIComponent(text)}`);
+            const data=await res.json();
+            if(data&&data.translation&&data.translation!==text) translated=data.translation;
+        }catch(e){}
+    }
+
+    return translated||text;
+}
+
+async function quickTranslate(){
+    const text=document.getElementById('quickInput').value.trim();
+    const from=document.getElementById('quickFromLang').value;
+    if(!text){alert('Please enter text!');return;}
+    const btn=document.getElementById('btnQuickTrans');
+    const status=document.getElementById('transStatus');
+    btn.disabled=true;btn.textContent='⏳ Translating...';
+    document.getElementById('quickResult').style.display='none';
+    status.textContent='🔄 Connecting to translation API...';
+    const translated=await callTranslateAPI(text,from,'en');
+    btn.disabled=false;btn.textContent=T[currentLang].quickTransBtn;
+    if(translated&&translated!==text){
+        document.getElementById('quickOutput').value=translated;
+        document.getElementById('quickResult').style.display='block';
+        status.textContent='✅ Translation successful!';
+        setTimeout(()=>status.textContent='',4000);
+    }else{
+        status.textContent='❌ Translation failed! Check internet connection.';
+    }
+}
+
+async function translateComplaint(id,btnEl){
+    if(currentLang==='en'){alert('Please select Tamil/Hindi/Telugu/Malayalam in AI Translate tab first!');return;}
+    const c=complaints.find(comp=>comp.id===id);
+    if(!c)return;
+    const origText=btnEl.textContent;
+    btnEl.textContent='⏳...';btnEl.disabled=true;
+    const textToTranslate=c.title+(c.desc?'. '+c.desc:'');
+    const translated=await callTranslateAPI(textToTranslate,'en',currentLang);
+    btnEl.textContent=origText;btnEl.disabled=false;
+    if(translated&&translated!==textToTranslate){
+        try{
+            await db.ref('complaints/'+c.firebaseKey).update({translatedText:translated,translatedLang:currentLang});
+        }catch(e){alert('Save failed: '+e.message);}
+    }else{
+        alert('Translation failed! Check internet connection.');
+    }
+}
+
+function copyToComplaint(){
+    document.getElementById('compDesc').value=document.getElementById('quickOutput').value;
+    showPage('submit');closeSidebar();
+    alert('✅ Copied to complaint form!');
+}
+
+// AUTH
+async function register(){
+    const name=document.getElementById('regName').value.trim();
+    const username=document.getElementById('regUser').value.trim();
+    const password=document.getElementById('regPass').value.trim();
+    const phone=document.getElementById('regPhone').value.trim();
+    const email=document.getElementById('regEmail').value.trim();
+    const address=document.getElementById('regAddress').value.trim();
+    if(!name||!username||!password||!phone){alert('Fill all required fields!');return;}
+    const snap=await db.ref('users').orderByChild('username').equalTo(username).once('value');
+    if(snap.exists()){alert('Username already exists!');return;}
+    await db.ref('users').push({username,password,role:'citizen',name,phone,email,address,lang:currentLang});
+    showAlert('✅','Registration Successful!','Welcome '+name+'! Please login.','#56ab2f');
+    alert('✅ Registration successful! Please login.');
+    showLogin();
+}
+
+async function login(){
+    const username=document.getElementById('loginUser').value.trim();
+    const password=document.getElementById('loginPass').value.trim();
+    const role=document.getElementById('loginRole').value;
+    if(!username||!password){alert('Please enter username and password!');return;}
+    const snap=await db.ref('users').orderByChild('username').equalTo(username).once('value');
+    let user=null;
+    snap.forEach(child=>{
+        const u=child.val();
+        if(u.password===password&&u.role===role) user={...u,firebaseKey:child.key};
+    });
+    if(!user){alert('Invalid credentials! Check username, password and role.');return;}
+    currentUser=user;
+    applyLang(user.lang||'en');
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('mainApp').style.display='block';
+    document.getElementById('navUser').textContent='👤 '+user.name;
+    if(user.role==='admin'){
+        document.getElementById('menuSubmit').style.display='none';
+        document.getElementById('quickTransBox').style.display='none';
+        document.getElementById('quickActions').innerHTML=`
+            <div class="quick-action" onclick="showPage('complaints');closeSidebar();"><div class="qa-icon">📋</div><h4>All Complaints</h4><p>Manage all complaints</p></div>
+            <div class="quick-action" onclick="showPage('translator');closeSidebar();"><div class="qa-icon">🌐</div><h4>AI Translate</h4><p>Translate complaints</p></div>
+            <div class="quick-action" onclick="showPage('notifications');closeSidebar();"><div class="qa-icon">🔔</div><h4>Notifications</h4><p>View all alerts</p></div>`;
+    }else{
+        document.getElementById('menuSubmit').style.display='flex';
+        document.getElementById('quickTransBox').style.display='block';
+    }
+    clearTranslator();
+    showPage('dashboard');
+    showAlert('👋','Welcome back!','Logged in as '+user.name+' | 📧 '+(user.email||'N/A')+' | 📱 '+(user.phone||'N/A'),'#f7971e');
+}
+
+function logout(){
+    clearTranslator();
+    currentUser=null;
+    document.getElementById('mainApp').style.display='none';
+    showHome();
+}
+function showRegister(){document.getElementById('loginPage').style.display='none';document.getElementById('registerPage').style.display='flex';}
+function showLogin(){document.getElementById('registerPage').style.display='none';document.getElementById('loginPage').style.display='flex';}
+
+function showPage(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const pageEl=document.getElementById(page);
+    if(pageEl)pageEl.classList.add('active');
+    ['dashboard','complaints','submit','translator','notifications','profile'].forEach(p=>{
+        const el=document.getElementById('menu'+p.charAt(0).toUpperCase()+p.slice(1));
+        if(el)el.classList.toggle('active',p===page);
+    });
+    if(page==='complaints')renderComplaints(complaints);
+    if(page==='dashboard')updateDashboard();
+    if(page==='notifications')renderNotifications();
+    if(page==='profile')renderProfile();
+    if(page==='submit'&&leafletMap){setTimeout(()=>{try{leafletMap.invalidateSize();}catch(e){}},300);}
+}
+
+function previewImage(){
+    const file=document.getElementById('compImage').files[0];
+    if(file){const r=new FileReader();r.onload=e=>{document.getElementById('imgPreview').src=e.target.result;document.getElementById('imgPreview').style.display='block';};r.readAsDataURL(file);}
+}
+
+// ✅ SUBMIT - FIXED AUTO TRANSLATE
+async function submitComplaint(){
+    const title=document.getElementById('compTitle').value.trim();
+    const category=document.getElementById('compCategory').value;
+    const location=document.getElementById('compLocation').value.trim();
+    const priority=document.getElementById('compPriority').value;
+    const dept=document.getElementById('compDept').value;
+    const contact=document.getElementById('compContact').value.trim();
+    const desc=document.getElementById('compDesc').value.trim();
+    const imgEl=document.getElementById('imgPreview');
+    const hasImg=imgEl.style.display!=='none'&&imgEl.src&&imgEl.src!==window.location.href;
+    if(!title||!location||!desc){alert('Please fill Title, Location and Description!');return;}
+
+    const btn=document.getElementById('btnSubmitComp');
+    const loading=document.getElementById('submitLoading');
+    btn.disabled=true;loading.style.display='block';
+
+    const originalTitle=title;
+    const originalDesc=desc;
+    const userLang=currentLang;
+    let englishTitle=title;
+    let englishDesc=desc;
+
+    // ✅ Auto translate to English if not English
+    if(currentLang!=='en'){
+        loading.textContent='🔄 Auto-translating to English for admin...';
+        try{
+            // Force Google Translate directly
+            const encTitle=encodeURIComponent(title);
+            const encDesc=encodeURIComponent(desc);
+
+            const r1=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${currentLang}&tl=en&dt=t&q=${encTitle}`);
+            const d1=await r1.json();
+            if(d1&&d1[0]&&d1[0][0]&&d1[0][0][0]){
+                englishTitle=d1[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
+            }
+
+            const r2=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${currentLang}&tl=en&dt=t&q=${encDesc}`);
+            const d2=await r2.json();
+            if(d2&&d2[0]&&d2[0][0]&&d2[0][0][0]){
+                englishDesc=d2[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
+            }
+
+            // Fallback: MyMemory if Google failed
+            if(!englishTitle||englishTitle===title){
+                const r3=await fetch(`https://api.mymemory.translated.net/get?q=${encTitle}&langpair=${currentLang}|en`);
+                const d3=await r3.json();
+                if(d3.responseStatus===200&&d3.responseData.translatedText!==title)
+                    englishTitle=d3.responseData.translatedText;
+            }
+            if(!englishDesc||englishDesc===desc){
+                const r4=await fetch(`https://api.mymemory.translated.net/get?q=${encDesc}&langpair=${currentLang}|en`);
+                const d4=await r4.json();
+                if(d4.responseStatus===200&&d4.responseData.translatedText!==desc)
+                    englishDesc=d4.responseData.translatedText;
+            }
+
+            console.log('✅ Translated Title:',englishTitle);
+            console.log('✅ Translated Desc:',englishDesc);
+        }catch(e){
+            console.log('❌ Auto-translate error:',e);
+        }
+    }
+
+    loading.textContent='☁️ Saving to Firebase Cloud...';
+    const complaintId='CMP'+Date.now().toString().slice(-6);
+    const data={
+        id:Date.now(),complaintId,
+        title:englishTitle,
+        desc:englishDesc,
+        originalTitle,
+        originalDesc,
+        userLang,
+        category,location,priority,dept,contact,
+        image:hasImg?imgEl.src:null,
+        status:'Pending',
+        citizen:currentUser.name,
+        username:currentUser.username,
+        phone:currentUser.phone||'',
+        email:currentUser.email||'',
+        date:new Date().toLocaleDateString(),
+        feedback:null,rating:null,
+        translatedText:null,translatedLang:null,
+        timestamp:firebase.database.ServerValue.TIMESTAMP
+    };
+
+    try{
+        await db.ref('complaints').push(data);
+        await db.ref('notifications').push({msg:'✅ '+englishTitle+' (ID: '+complaintId+')',userId:currentUser.username,date:new Date().toLocaleString(),timestamp:Date.now()});
+        await db.ref('notifications').push({msg:'🆕 '+currentUser.name+': '+englishTitle+' | 📱 '+data.phone+' | 📧 '+data.email,userId:'admin',date:new Date().toLocaleString(),timestamp:Date.now()});
+    }catch(e){
+        alert('Firebase save error: '+e.message);
+        btn.disabled=false;loading.style.display='none';
+        return;
+    }
+
+    btn.disabled=false;loading.style.display='none';
+
+    // Email/SMS simulation popups
+    showAlert('📧','Email Sent!','Complaint '+complaintId+' submitted! Check '+( currentUser.email||'your email'),'#4fc3f7');
+    setTimeout(()=>showAlert('📱','SMS Sent!','SMS to '+(currentUser.phone||'your phone')+': Complaint '+complaintId+' received!','#56ab2f'),1500);
+
+    // Reset form
+    document.getElementById('compTitle').value='';
+    document.getElementById('compLocation').value='';
+    document.getElementById('compDesc').value='';
+    document.getElementById('compContact').value='';
+    document.getElementById('imgPreview').style.display='none';
+    document.getElementById('mapContainer').style.display='none';
+    document.getElementById('accuracyDiv').style.display='none';
+    if(leafletMap){try{leafletMap.off();leafletMap.remove();}catch(e){}leafletMap=null;}
+
+    alert('✅ Complaint submitted! ID: '+complaintId);
+    showPage('complaints');
+}
+
+async function updateStatus(firebaseKey,id,status){
+    try{
+        await db.ref('complaints/'+firebaseKey).update({status});
+        const comp=complaints.find(c=>c.id===id);
+        if(comp){
+            await db.ref('notifications').push({msg:'📢 '+comp.title+' → '+status,userId:comp.username,date:new Date().toLocaleString(),timestamp:Date.now()});
+            showAlert('📧','Status Update!','Complaint '+comp.complaintId+' is now "'+status+'" | 📧 '+(comp.email||'N/A'),'#4fc3f7');
+            setTimeout(()=>showAlert('📱','SMS Update!','SMS to '+(comp.phone||'N/A')+': Your complaint is now "'+status+'"','#56ab2f'),1000);
+        }
+    }catch(e){alert('Update failed: '+e.message);}
+}
+
+async function deleteComplaint(firebaseKey){
+    if(!confirm('Delete this complaint?'))return;
+    try{await db.ref('complaints/'+firebaseKey).remove();}
+    catch(e){alert('Delete failed: '+e.message);}
+}
+
+function printComplaint(id){
+    const c=complaints.find(comp=>comp.id===id);
+    if(!c)return;
+    const w=window.open('','_blank');
+    w.document.write(`<html><head><title>${c.complaintId}</title><style>body{font-family:Arial;padding:30px;}h2{color:#f7971e;}table{width:100%;border-collapse:collapse;margin-top:20px;}td{padding:10px;border:1px solid #ddd;}.s{color:green;font-weight:bold;}</style></head><body><h2>🏛️ Smart Complaint & Service Request System</h2><h3>Official Complaint Report</h3><table><tr><td><b>ID</b></td><td>${c.complaintId}</td></tr><tr><td><b>Title</b></td><td>${c.title}</td></tr>${c.originalTitle&&c.userLang!=='en'?`<tr><td><b>Original(${c.userLang})</b></td><td>${c.originalTitle}</td></tr>`:''}<tr><td><b>Category</b></td><td>${c.category}</td></tr><tr><td><b>Dept</b></td><td>${c.dept}</td></tr><tr><td><b>Location</b></td><td>${c.location}</td></tr><tr><td><b>Priority</b></td><td>${c.priority}</td></tr><tr><td><b>Description</b></td><td>${c.desc}</td></tr><tr><td><b>Citizen</b></td><td>${c.citizen}</td></tr><tr><td><b>Phone</b></td><td>${c.phone||c.contact||'N/A'}</td></tr><tr><td><b>Email</b></td><td>${c.email||'N/A'}</td></tr><tr><td><b>Date</b></td><td>${c.date}</td></tr><tr><td><b>Status</b></td><td class="s">${c.status}</td></tr>${c.feedback?`<tr><td><b>Feedback</b></td><td>${c.feedback} (${'★'.repeat(c.rating||0)})</td></tr>`:''}</table><p style="color:#aaa;font-size:11px;margin-top:20px;">Generated: ${new Date().toLocaleString()} | Firebase Cloud</p><script>window.print();<\/script></body></html>`);
+}
+
+function searchComplaints(){
+    const q=document.getElementById('searchInput').value.toLowerCase();
+    renderComplaints(complaints.filter(c=>(c.title||'').toLowerCase().includes(q)||(c.location||'').toLowerCase().includes(q)||(c.complaintId||'').toLowerCase().includes(q)));
+}
+function filterComplaints(){
+    const s=document.getElementById('filterStatus').value;
+    renderComplaints(s==='All'?complaints:complaints.filter(c=>c.status===s));
+}
+
+function updateBadges(){
+    if(!currentUser)return;
+    const list=currentUser.role==='citizen'?complaints.filter(c=>c.username===currentUser.username):complaints;
+    document.getElementById('pendingBadge').textContent=list.filter(c=>c.status==='Pending').length;
+    const myNotifs=notifications.filter(n=>n.userId===currentUser.username||(n.userId==='admin'&&currentUser.role==='admin'));
+    document.getElementById('notifBadge').textContent=myNotifs.length;
+}
+
+function updateDashboard(){
+    if(!currentUser)return;
+    const t=T[currentLang];
+    const list=currentUser.role==='citizen'?complaints.filter(c=>c.username===currentUser.username):complaints;
+    document.getElementById('dTotal').textContent=list.length;
+    document.getElementById('dPending').textContent=list.filter(c=>c.status==='Pending').length;
+    document.getElementById('dProgress').textContent=list.filter(c=>c.status==='In Progress').length;
+    document.getElementById('dResolved').textContent=list.filter(c=>c.status==='Resolved').length;
+    document.getElementById('recentList').innerHTML=list.slice(0,3).length?list.slice(0,3).map(c=>renderCard(c)).join(''):`<div class="empty-msg">${t.noComplaints}</div>`;
+    const mine=complaints.filter(c=>c.username===currentUser.username);
+    document.getElementById('sbTotal').textContent=currentUser.role==='admin'?list.length:mine.length;
+    document.getElementById('sbPending').textContent=currentUser.role==='admin'?list.filter(c=>c.status==='Pending').length:mine.filter(c=>c.status==='Pending').length;
+    document.getElementById('sbResolved').textContent=currentUser.role==='admin'?list.filter(c=>c.status==='Resolved').length:mine.filter(c=>c.status==='Resolved').length;
+    document.getElementById('sidebarName').textContent=currentUser.name;
+    document.getElementById('sidebarRole').textContent=currentUser.role==='admin'?t.admin:t.citizen;
+    updateBadges();
+}
+
+function renderComplaints(list){
+    if(!currentUser)return;
+    const t=T[currentLang];
+    const filtered=currentUser.role==='citizen'?list.filter(c=>c.username===currentUser.username):list;
+    document.getElementById('complaintsList').innerHTML=filtered.length?filtered.map(c=>renderCard(c)).join(''):`<div class="empty-msg">${t.noComplaints}</div>`;
+}
+
+function renderCard(c){
+    const isAdmin=currentUser.role==='admin';
+    const statusKey=(c.status||'Pending').replace(' ','');
+    const t=T[currentLang];
+    const displayTitle=isAdmin?(c.title||''):(c.originalTitle||c.title||'');
+    const displayDesc=isAdmin?(c.desc||''):(c.originalDesc||c.desc||'');
+    const showTranslated=isAdmin&&c.translatedText&&c.translatedLang===currentLang;
+    const fkey=c.firebaseKey||'';
+    return `<div class="complaint-card priority-${c.priority||'Medium'}">
+        <h4>📌 ${displayTitle} <small style="color:#aaa;font-size:11px;">#${c.complaintId||''}</small><span class="dept-badge">${c.dept||''}</span></h4>
+        <p>📂 ${c.category||''} | 📍 ${c.location||''} | 📅 ${c.date||''} | ⚡ ${c.priority||''}</p>
+        <p>👤 ${c.citizen||''} ${c.phone?'| 📞 '+c.phone:''} ${isAdmin&&c.email?'| 📧 '+c.email:''}</p>
+        <p style="color:var(--text);margin-top:5px;">${displayDesc}</p>
+        ${isAdmin&&c.originalDesc&&c.userLang&&c.userLang!=='en'?`<div class="original-box"><p>${t.originalLabel} (${c.userLang}):</p><span>${c.originalTitle||''} - ${c.originalDesc}</span></div>`:''}
+        ${showTranslated?`<div class="translated-box"><p class="trans-label">${t.translatedLabel}</p><p class="trans-text">${c.translatedText}</p></div>`:''}
+        ${c.image?`<img src="${c.image}" class="img-preview"/>`:''}
+        <br><span class="status-badge status-${statusKey}">${c.status||'Pending'}</span>
+        ${c.feedback?`<div class="feedback-box"><span style="color:#ffd200;">${'★'.repeat(c.rating||0)}${'☆'.repeat(5-(c.rating||0))}</span><p>${c.feedback}</p></div>`:''}
+        <div class="card-actions">
+            ${isAdmin&&c.status==='Pending'?`<button class="btn-action btn-progress" onclick="updateStatus('${fkey}',${c.id},'In Progress')">▶ In Progress</button>`:''}
+            ${isAdmin&&c.status!=='Resolved'?`<button class="btn-action btn-resolve" onclick="updateStatus('${fkey}',${c.id},'Resolved')">✅ Resolve</button>`:''}
+            ${isAdmin?`<button class="btn-action btn-del" onclick="deleteComplaint('${fkey}')">🗑 Delete</button>`:''}
+            <button class="btn-action btn-print" onclick="printComplaint(${c.id})">🖨️ Print</button>
+            ${isAdmin&&currentLang!=='en'?`<button class="btn-action btn-translate-comp" onclick="translateComplaint(${c.id},this)">${t.translateBtn}</button>`:''}
+            ${!isAdmin&&c.status==='Resolved'&&!c.feedback?`<button class="btn-action btn-feedback" onclick="openFeedback('${fkey}',${c.id})">⭐ Feedback</button>`:''}
+        </div>
+    </div>`;
+}
+
+function renderProfile(){
+    if(!currentUser)return;
+    const u=currentUser;const t=T[currentLang];
+    document.getElementById('profileName').textContent=u.name;
+    document.getElementById('profileRoleText').textContent='🎭 '+(u.role==='admin'?t.admin:t.citizen);
+    document.getElementById('profileUsername').textContent=u.username;
+    document.getElementById('profilePhone').textContent=u.phone||'N/A';
+    document.getElementById('profileEmail').textContent=u.email||'N/A';
+    document.getElementById('profileAddress').textContent=u.address||'N/A';
+    document.getElementById('profileRole').textContent=u.role==='admin'?t.admin:t.citizen;
+    const mine=complaints.filter(c=>c.username===u.username);
+    document.getElementById('pTotal').textContent=mine.length;
+    document.getElementById('pPending').textContent=mine.filter(c=>c.status==='Pending').length;
+    document.getElementById('pResolved').textContent=mine.filter(c=>c.status==='Resolved').length;
+}
+
+function renderNotifications(){
+    if(!currentUser)return;
+    const t=T[currentLang];
+    const myNotifs=notifications.filter(n=>n.userId===currentUser.username||(n.userId==='admin'&&currentUser.role==='admin'));
+    document.getElementById('notifList').innerHTML=myNotifs.length?myNotifs.map(n=>`<div class="notif-item"><p>${n.msg}</p><span>${n.date}</span></div>`).join(''):`<div class="empty-msg">${t.noNotif}</div>`;
+    document.getElementById('notifBadge').textContent=myNotifs.length;
+}
+
+function openFeedback(firebaseKey,id){
+    feedbackComplaintId={firebaseKey,id};selectedRating=0;
+    document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));
+    document.getElementById('feedbackText').value='';
+    document.getElementById('feedbackModal').classList.add('open');
+}
+function closeModal(){document.getElementById('feedbackModal').classList.remove('open');}
+function setRating(n){selectedRating=n;document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<n));}
+async function submitFeedback(){
+    if(!selectedRating){alert('Please select a rating!');return;}
+    const text=document.getElementById('feedbackText').value.trim();
+    try{
+        await db.ref('complaints/'+feedbackComplaintId.firebaseKey).update({feedback:text||'No comment',rating:selectedRating});
+        closeModal();alert('✅ Thank you for your feedback!');
+    }catch(e){alert('Save failed: '+e.message);}
+}
+
+// ========== INIT ==========
+window.onload=async()=>{
+    await initAdminUser();
+    initFirebaseListeners();
+};
+</script>
+</body>
+</html>
+        
