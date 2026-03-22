@@ -231,6 +231,16 @@
         @keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(86,171,47,0.4);}50%{box-shadow:0 0 0 8px rgba(86,171,47,0);}}
         .voice-status{font-size:11px;color:#56ab2f;margin-top:4px;min-height:16px;text-align:center;}
 
+        /* ── VOICE INDICATOR BAR ── */
+        .voice-info-bar{display:none;align-items:center;gap:8px;background:rgba(86,171,47,0.12);border:1px solid rgba(86,171,47,0.3);border-radius:8px;padding:8px 12px;margin-top:6px;}
+        .voice-info-bar.show{display:flex;}
+        .voice-word-count{font-size:11px;color:#56ab2f;font-weight:bold;}
+        .voice-lang-label{font-size:11px;color:#4fc3f7;margin-left:auto;}
+        .voice-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#56ab2f;margin:0 2px;animation:vdot 1s infinite;}
+        .voice-dots span:nth-child(2){animation-delay:.2s;}
+        .voice-dots span:nth-child(3){animation-delay:.4s;}
+        @keyframes vdot{0%,100%{opacity:0.2;transform:scale(0.8);}50%{opacity:1;transform:scale(1.2);}}
+
         .empty-msg{text-align:center;color:var(--text-muted);padding:40px;}
         select option{background:#1a1a2e;color:white;}
         .priority-High{border-left-color:#e94560 !important;}
@@ -449,12 +459,18 @@
                     <div id="satelliteMap"></div>
                 </div>
 
-                <!-- VOICE + TEXTAREA -->
+                <!-- VOICE + TEXTAREA — FIXED -->
                 <div class="voice-wrap">
                     <textarea id="compDesc" placeholder="Describe your complaint... or use 🎤 Voice button to speak!"></textarea>
                     <button type="button" class="btn-voice" id="voiceBtn" onclick="toggleVoice()">🎤 Voice</button>
                 </div>
+                <!-- Voice status + live word count bar -->
                 <div class="voice-status" id="voiceStatus"></div>
+                <div class="voice-info-bar" id="voiceInfoBar">
+                    <div class="voice-dots"><span></span><span></span><span></span></div>
+                    <span class="voice-word-count" id="voiceWordCount">0 words captured</span>
+                    <span class="voice-lang-label" id="voiceLangLabel">ta-IN</span>
+                </div>
 
                 <input type="file" id="compImage" accept="image/*" onchange="previewImage()" style="color:var(--text);margin-bottom:12px;"/>
                 <img id="imgPreview" class="img-preview" style="display:none;"/>
@@ -575,7 +591,7 @@ let feedbackComplaintId=null,currentLang='en';
 let leafletMap=null,currentMarker=null,satelliteLayer=null,streetLayer=null;
 let recognition=null;
 
-// ========== FIREBASE ==========
+// ========== FIREBASE INIT ==========
 async function initAdminUser(){
     const snap=await db.ref('users').orderByChild('username').equalTo('admin').once('value');
     if(!snap.exists()) await db.ref('users').push({username:'admin',password:'admin123',role:'admin',name:'Administrator',phone:'9999999999',email:'admin@gov.in',address:'Government Office',lang:'en'});
@@ -604,91 +620,153 @@ function showAlert(icon,title,message,color='#f7971e'){
     setTimeout(()=>{if(document.getElementById(id))document.getElementById(id).remove();},5000);
 }
 
-// ========== 🎤 VOICE TO TEXT ==========
-function toggleVoice(){
-    const btn=document.getElementById('voiceBtn');
-    const status=document.getElementById('voiceStatus');
+// ══════════════════════════════════════════════════════
+// 🎤 VOICE TO TEXT — FIXED v2 (Zero Duplicate Words)
+// Root cause of old bug:
+//   - finalTranscript was a LOCAL var, re-created each onresult call
+//   - Loop started from 0 each time → re-processed old results → duplicates
+// Fix:
+//   - voiceFinalText = MODULE-LEVEL accumulator (never reset mid-session)
+//   - Loop starts from event.resultIndex → only NEW chunks processed
+//   - interim shown live but NOT added to accumulator until isFinal
+// ══════════════════════════════════════════════════════
+let voiceFinalText = ''; // ← GLOBAL accumulator for confirmed words
 
+function toggleVoice(){
+    const btn    = document.getElementById('voiceBtn');
+    const status = document.getElementById('voiceStatus');
+    const infoBar= document.getElementById('voiceInfoBar');
+
+    // ── STOP ──
     if(recognition){
         recognition.stop();
-        recognition=null;
-        btn.textContent='🎤 Voice';
+        recognition = null;
+        btn.textContent = '🎤 Voice';
         btn.classList.remove('listening');
-        status.textContent='';
+        // Show clean final text (strip any leftover interim bracket)
+        const ta = document.getElementById('compDesc');
+        ta.value = voiceFinalText.trim();
+        status.textContent = ta.value ? '✅ Voice captured! Click Submit.' : '';
+        status.style.color = '#56ab2f';
+        infoBar.classList.remove('show');
+        voiceFinalText = '';
         return;
     }
 
-    if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
-        alert('Voice not supported! Please use Chrome browser.');
+    if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+        alert('Voice not supported! Please use Chrome or Edge browser.');
         return;
     }
 
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    recognition=new SR();
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
 
-    // Language based on app language
-    const langMap={'en':'en-IN','ta':'ta-IN','hi':'hi-IN','te':'te-IN','ml':'ml-IN'};
-    recognition.lang=langMap[currentLang]||'ta-IN';
-    recognition.continuous=true;
-    recognition.interimResults=true;
+    const langMap = {'en':'en-IN','ta':'ta-IN','hi':'hi-IN','te':'te-IN','ml':'ml-IN'};
+    const voiceLang = langMap[currentLang] || 'ta-IN';
+    recognition.lang            = voiceLang;
+    recognition.continuous      = true;
+    recognition.interimResults  = true;
+    recognition.maxAlternatives = 1;
 
-    btn.textContent='🔴 Stop';
+    btn.textContent = '🔴 Stop';
     btn.classList.add('listening');
-    status.textContent='🎤 Listening... Speak now!';
-    status.style.color='#56ab2f';
+    status.textContent = '🎤 Listening... Speak now!';
+    status.style.color = '#56ab2f';
+    infoBar.classList.add('show');
+    document.getElementById('voiceLangLabel').textContent = voiceLang;
 
-    let finalTranscript='';
+    // Seed accumulator with any text already typed in textarea
+    const existingText = document.getElementById('compDesc').value.replace(/\[.*?\]/g,'').trim();
+    voiceFinalText = existingText;
+    updateWordCount();
 
-    recognition.onresult=(event)=>{
-        let interim='';
-        for(let i=event.resultIndex;i<event.results.length;i++){
-            if(event.results[i].isFinal){
-                finalTranscript+=event.results[i][0].transcript+' ';
-            }else{
-                interim+=event.results[i][0].transcript;
+    // ── THE CORE FIX ──
+    recognition.onresult = (event) => {
+        const textarea = document.getElementById('compDesc');
+        let interimTranscript = '';
+
+        // ✅ Start loop from event.resultIndex — NOT from 0
+        // This means we only see brand-new result chunks, never old ones
+        for(let i = event.resultIndex; i < event.results.length; i++){
+            const result     = event.results[i];
+            const transcript = result[0].transcript;
+
+            if(result.isFinal){
+                // Confirmed word(s) → append to accumulator with smart spacing
+                const needSpace = voiceFinalText.length > 0
+                    && !voiceFinalText.endsWith(' ')
+                    && !voiceFinalText.endsWith('\n');
+                voiceFinalText += (needSpace ? ' ' : '') + transcript;
+                interimTranscript = ''; // clear interim once finalized
+                updateWordCount();
+                status.textContent = '✅ Captured. Keep speaking...';
+                status.style.color = '#4fc3f7';
+            } else {
+                // Interim — overwrite (never accumulate) so it just shows a live preview
+                interimTranscript = transcript;
             }
         }
-        const textarea=document.getElementById('compDesc');
-        // Show final + interim preview
-        textarea.value=finalTranscript+(interim?'['+interim+']':'');
-        status.textContent='🎤 Speaking: "'+interim+'"';
+
+        // Render: finalized text + live interim preview in brackets
+        textarea.value = voiceFinalText
+            + (interimTranscript ? ' [' + interimTranscript + ']' : '');
+
+        if(interimTranscript){
+            status.textContent = '🎙️ "' + interimTranscript + '"';
+            status.style.color = '#56ab2f';
+        }
     };
 
-    recognition.onerror=(event)=>{
-        btn.textContent='🎤 Voice';
+    recognition.onerror = (event) => {
+        // no-speech is non-fatal — just notify, DON'T stop recognition
+        if(event.error === 'no-speech'){
+            status.textContent = '🔇 No speech. Try again...';
+            status.style.color = '#ffd200';
+            return; // ← keep listening
+        }
+        // Fatal errors — clean up
+        btn.textContent = '🎤 Voice';
         btn.classList.remove('listening');
-        recognition=null;
-        if(event.error==='not-allowed'){
-            status.textContent='❌ Allow microphone permission!';
-            status.style.color='#e94560';
+        infoBar.classList.remove('show');
+        recognition = null;
+        voiceFinalText = '';
+        if(event.error === 'not-allowed'){
+            status.textContent = '❌ Allow microphone permission!';
+            status.style.color = '#e94560';
             alert('Please allow microphone access in browser settings!');
-        }else if(event.error==='no-speech'){
-            status.textContent='No speech detected. Try again.';
-            status.style.color='#ffd200';
-        }else{
-            status.textContent='Voice error: '+event.error;
-            status.style.color='#e94560';
+        } else {
+            status.textContent = 'Voice error: ' + event.error;
+            status.style.color = '#e94560';
         }
     };
 
-    recognition.onend=()=>{
-        // Clean interim brackets
-        const textarea=document.getElementById('compDesc');
-        textarea.value=textarea.value.replace(/\[.*?\]/g,'').trim();
-        btn.textContent='🎤 Voice';
+    recognition.onend = () => {
+        // Strip leftover interim brackets and show clean final text
+        const textarea = document.getElementById('compDesc');
+        textarea.value = voiceFinalText.trim();
+        btn.textContent = '🎤 Voice';
         btn.classList.remove('listening');
-        recognition=null;
+        infoBar.classList.remove('show');
+        recognition = null;
         if(textarea.value){
-            status.textContent='✅ Voice captured! Click Submit.';
-            status.style.color='#56ab2f';
-        }else{
-            status.textContent='';
+            status.textContent = '✅ Voice captured! Click Submit.';
+            status.style.color = '#56ab2f';
+        } else {
+            status.textContent = '';
         }
+        voiceFinalText = '';
     };
 
     recognition.start();
-    showAlert('🎤','Voice Active!','Speak in '+recognition.lang+' - Click Stop when done','#56ab2f');
+    showAlert('🎤','Voice Active!','Speaking in '+voiceLang+' — click Stop when done','#56ab2f');
 }
+
+function updateWordCount(){
+    const words = voiceFinalText.trim().split(/\s+/).filter(Boolean).length;
+    const el = document.getElementById('voiceWordCount');
+    if(el) el.textContent = words + ' word' + (words!==1?'s':'') + ' captured';
+}
+// ══════════════════════════════════════════════════════
 
 // ========== TRANSLATIONS ==========
 const T={
@@ -900,6 +978,7 @@ async function login(){
 
 function logout(){
     if(recognition){recognition.stop();recognition=null;}
+    voiceFinalText='';
     clearTranslator();currentUser=null;
     document.getElementById('mainApp').style.display='none';
     showHome();
@@ -916,8 +995,8 @@ function showPage(page){
     if(page==='notifications')renderNotifications();
     if(page==='profile')renderProfile();
     if(page==='submit'&&leafletMap)setTimeout(()=>{try{leafletMap.invalidateSize();}catch(e){}},300);
-    // Stop voice when leaving submit
-    if(page!=='submit'&&recognition){recognition.stop();recognition=null;}
+    // Stop voice when leaving submit page
+    if(page!=='submit'&&recognition){recognition.stop();recognition=null;voiceFinalText='';}
 }
 
 function previewImage(){
@@ -940,7 +1019,7 @@ async function submitComplaint(){
     const hasImg=imgEl.style.display!=='none'&&imgEl.src&&imgEl.src!==window.location.href;
     if(!title||!location||!desc){alert('Please fill Title, Location and Description!');return;}
     // Stop voice if running
-    if(recognition){recognition.stop();recognition=null;}
+    if(recognition){recognition.stop();recognition=null;voiceFinalText='';}
     const btn=document.getElementById('btnSubmitComp');
     const loading=document.getElementById('submitLoading');
     btn.disabled=true;loading.style.display='block';
@@ -977,6 +1056,7 @@ async function submitComplaint(){
     document.getElementById('compDesc').value='';
     document.getElementById('compContact').value='';
     document.getElementById('voiceStatus').textContent='';
+    document.getElementById('voiceInfoBar').classList.remove('show');
     document.getElementById('imgPreview').style.display='none';
     document.getElementById('mapContainer').style.display='none';
     document.getElementById('accuracyDiv').style.display='none';
