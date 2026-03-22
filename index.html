@@ -138,7 +138,7 @@
         .form-box{background:var(--card);border-radius:15px;padding:25px;border:1px solid var(--card-border);margin-bottom:20px;}
         .form-box h3{color:#f7971e;margin-bottom:18px;font-size:17px;}
         .form-box input,.form-box select,.form-box textarea{width:100%;padding:12px;margin-bottom:12px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;}
-        .form-box textarea{height:80px;resize:none;}
+        .form-box textarea{height:100px;resize:none;}
         .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
         .btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a1a;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;}
         .btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
@@ -222,6 +222,15 @@
         .modal-btns{display:flex;gap:10px;}
         .btn-cancel{flex:1;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;}
         .btn-confirm{flex:1;padding:10px;background:#f7971e;color:#1a1a1a;border:none;border-radius:8px;font-weight:bold;cursor:pointer;}
+
+        /* VOICE BUTTON */
+        .voice-wrap{position:relative;margin-bottom:12px;}
+        .voice-wrap textarea{margin-bottom:0;padding-bottom:45px;}
+        .btn-voice{position:absolute;right:10px;bottom:10px;padding:7px 14px;background:linear-gradient(135deg,#e94560,#ff6b6b);color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:bold;transition:all 0.3s;}
+        .btn-voice.listening{background:linear-gradient(135deg,#56ab2f,#a8e063);color:#1a1a1a;animation:voicePulse 1s infinite;}
+        @keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(86,171,47,0.4);}50%{box-shadow:0 0 0 8px rgba(86,171,47,0);}}
+        .voice-status{font-size:11px;color:#56ab2f;margin-top:4px;min-height:16px;text-align:center;}
+
         .empty-msg{text-align:center;color:var(--text-muted);padding:40px;}
         select option{background:#1a1a2e;color:white;}
         .priority-High{border-left-color:#e94560 !important;}
@@ -250,7 +259,7 @@
     </nav>
     <div class="sidebar-overlay" id="homeSidebarOverlay" onclick="closeHomeSidebar()"></div>
     <div class="home-sidebar" id="homeSidebar">
-        <div class="home-sidebar-info"><h3>🏛️ Smart Complaint System</h3><p>AI-Powered Citizen Service Platform with Firebase Cloud</p></div>
+        <div class="home-sidebar-info"><h3>🏛️ Smart Complaint System</h3><p>AI-Powered Citizen Service Platform with Firebase Cloud & Voice Input</p></div>
         <div class="home-sidebar-menu">
             <div class="home-menu-item clickable" onclick="goToLogin()"><span>🔐</span><span>Login / Register</span></div>
             <div class="home-menu-item locked"><span>📊</span><span>Dashboard</span><span class="lock-icon">🔒</span></div>
@@ -266,19 +275,19 @@
             <div class="gov-title">Government of Tamil Nadu</div>
             <div class="gov-title" style="color:rgba(255,255,255,0.6);margin-top:3px;">Department of Public Services</div>
             <h1 class="app-name" style="margin-top:15px;">Smart Complaint & Service Request System</h1>
-            <p class="app-tagline">AI-Powered • Multilingual • Real-time • Satellite GPS • Firebase Cloud</p>
+            <p class="app-tagline">AI-Powered • Multilingual • Voice Input • Satellite GPS • Firebase Cloud</p>
             <button class="hero-btn" onclick="goToLogin()">🚀 Get Started - Login / Register</button>
         </div>
         <div class="features-section">
             <h2 class="features-title">Why Choose Our Platform?</h2>
             <p class="features-sub">Complete digital solution for citizen grievance redressal</p>
             <div class="features-grid">
-                <div class="feature-card"><div class="feature-icon">🤖</div><h4>AI Translation</h4><p>5 Indian languages with auto-translate</p></div>
+                <div class="feature-card"><div class="feature-icon">🎤</div><h4>Voice Input</h4><p>Can't type? Just speak in Tamil, Hindi, Telugu or Malayalam!</p></div>
+                <div class="feature-card"><div class="feature-icon">🤖</div><h4>AI Translation</h4><p>5 Indian languages with auto-translate to English</p></div>
                 <div class="feature-card"><div class="feature-icon">🛰️</div><h4>Satellite GPS</h4><p>Exact location with satellite maps</p></div>
                 <div class="feature-card"><div class="feature-icon">☁️</div><h4>Firebase Cloud</h4><p>Real-time sync across all devices</p></div>
-                <div class="feature-card"><div class="feature-icon">🔔</div><h4>Smart Alerts</h4><p>Email & SMS simulation notifications</p></div>
                 <div class="feature-card"><div class="feature-icon">📊</div><h4>Live Dashboard</h4><p>Real-time complaint tracking</p></div>
-                <div class="feature-card"><div class="feature-icon">🖨️</div><h4>Print Reports</h4><p>Official complaint reports</p></div>
+                <div class="feature-card"><div class="feature-icon">🔔</div><h4>Smart Alerts</h4><p>Email & SMS simulation notifications</p></div>
             </div>
         </div>
         <div class="stats-section">
@@ -294,12 +303,12 @@
             <h2 class="how-title">How It Works</h2>
             <div class="steps-grid">
                 <div class="step-card"><div class="step-num">1</div><h4>Register</h4><p>Create citizen account</p></div>
-                <div class="step-card"><div class="step-num">2</div><h4>Submit</h4><p>File complaint with GPS</p></div>
+                <div class="step-card"><div class="step-num">2</div><h4>Speak/Type</h4><p>Voice or text complaint</p></div>
                 <div class="step-card"><div class="step-num">3</div><h4>Track</h4><p>Monitor real-time status</p></div>
                 <div class="step-card"><div class="step-num">4</div><h4>Resolved</h4><p>Get notified & give feedback</p></div>
             </div>
         </div>
-        <div class="home-footer"><p>🏛️ Smart Complaint & Service Request Management System | ☁️ Firebase Cloud | 🤖 AI Enabled | © 2026 Government of Tamil Nadu</p></div>
+        <div class="home-footer"><p>🏛️ Smart Complaint & Service Request Management System | ☁️ Firebase | 🤖 AI | 🎤 Voice | © 2026 Government of Tamil Nadu</p></div>
     </div>
 </div>
 
@@ -378,7 +387,7 @@
             <div class="menu-item" id="menuProfile" onclick="showPage('profile');closeSidebar();"><span class="menu-icon">👤</span><span id="menuProfileText">Profile</span></div>
         </div>
     </div>
-    <div class="status-bar">🟢 <span id="dbStatusText">Connected to Firebase Cloud</span> | 🤖 AI Active | 🛰️ Satellite Maps | 🌐 <span id="activeLangBar">English</span></div>
+    <div class="status-bar">🟢 <span id="dbStatusText">Connected to Firebase Cloud</span> | 🤖 AI Active | 🛰️ Satellite | 🎤 Voice | 🌐 <span id="activeLangBar">English</span></div>
     <div class="main-content">
 
         <!-- DASHBOARD -->
@@ -391,7 +400,7 @@
                 <div class="dash-card resolved"><h2 id="dResolved">0</h2><p id="dResolvedLabel">Resolved</p></div>
             </div>
             <div class="quick-actions" id="quickActions">
-                <div class="quick-action" onclick="showPage('submit');closeSidebar();"><div class="qa-icon">📝</div><h4 id="qaSubmit">Submit Complaint</h4><p>File a new complaint</p></div>
+                <div class="quick-action" onclick="showPage('submit');closeSidebar();"><div class="qa-icon">📝</div><h4 id="qaSubmit">Submit Complaint</h4><p>Type or Voice</p></div>
                 <div class="quick-action" onclick="showPage('complaints');closeSidebar();"><div class="qa-icon">📋</div><h4 id="qaView">View Complaints</h4><p>Track your complaints</p></div>
                 <div class="quick-action" onclick="showPage('translator');closeSidebar();"><div class="qa-icon">🌐</div><h4 id="qaTranslate">AI Translate</h4><p>Multilingual support</p></div>
             </div>
@@ -439,7 +448,14 @@
                     </div>
                     <div id="satelliteMap"></div>
                 </div>
-                <textarea id="compDesc" placeholder="Describe your complaint in detail..."></textarea>
+
+                <!-- VOICE + TEXTAREA -->
+                <div class="voice-wrap">
+                    <textarea id="compDesc" placeholder="Describe your complaint... or use 🎤 Voice button to speak!"></textarea>
+                    <button type="button" class="btn-voice" id="voiceBtn" onclick="toggleVoice()">🎤 Voice</button>
+                </div>
+                <div class="voice-status" id="voiceStatus"></div>
+
                 <input type="file" id="compImage" accept="image/*" onchange="previewImage()" style="color:var(--text);margin-bottom:12px;"/>
                 <img id="imgPreview" class="img-preview" style="display:none;"/>
                 <button class="btn-submit" id="btnSubmitComp" onclick="submitComplaint()">SUBMIT COMPLAINT 🚀</button>
@@ -549,45 +565,35 @@
 
 <script>
 // ========== FIREBASE ==========
-const firebaseConfig = {
-    apiKey:"AIzaSyALnVyNFHs9G5caA35v68EZXliSxbwnojQ",
-    authDomain:"smart-complaint-system-e9220.firebaseapp.com",
-    databaseURL:"https://smart-complaint-system-e9220-default-rtdb.firebaseio.com",
-    projectId:"smart-complaint-system-e9220",
-    storageBucket:"smart-complaint-system-e9220.firebasestorage.app",
-    messagingSenderId:"747799721892",
-    appId:"1:747799721892:web:f805e5d6c682e337f73331"
-};
+const firebaseConfig={apiKey:"AIzaSyALnVyNFHs9G5caA35v68EZXliSxbwnojQ",authDomain:"smart-complaint-system-e9220.firebaseapp.com",databaseURL:"https://smart-complaint-system-e9220-default-rtdb.firebaseio.com",projectId:"smart-complaint-system-e9220",storageBucket:"smart-complaint-system-e9220.firebasestorage.app",messagingSenderId:"747799721892",appId:"1:747799721892:web:f805e5d6c682e337f73331"};
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const db=firebase.database();
 
 // ========== STATE ==========
-let currentUser=null, complaints=[], notifications=[], selectedRating=0;
-let feedbackComplaintId=null, currentLang='en';
-let leafletMap=null, currentMarker=null, satelliteLayer=null, streetLayer=null;
+let currentUser=null,complaints=[],notifications=[],selectedRating=0;
+let feedbackComplaintId=null,currentLang='en';
+let leafletMap=null,currentMarker=null,satelliteLayer=null,streetLayer=null;
+let recognition=null;
 
-// ========== FIREBASE INIT ==========
+// ========== FIREBASE ==========
 async function initAdminUser(){
     const snap=await db.ref('users').orderByChild('username').equalTo('admin').once('value');
-    if(!snap.exists()){
-        await db.ref('users').push({username:'admin',password:'admin123',role:'admin',name:'Administrator',phone:'9999999999',email:'admin@gov.in',address:'Government Office',lang:'en'});
-    }
+    if(!snap.exists()) await db.ref('users').push({username:'admin',password:'admin123',role:'admin',name:'Administrator',phone:'9999999999',email:'admin@gov.in',address:'Government Office',lang:'en'});
 }
-
 function initFirebaseListeners(){
     db.ref('complaints').on('value',snap=>{
         complaints=[];
-        snap.forEach(child=>{ complaints.unshift({...child.val(),firebaseKey:child.key}); });
-        if(currentUser){ updateDashboard(); if(document.getElementById('complaints').classList.contains('active')) renderComplaints(complaints); }
+        snap.forEach(child=>complaints.unshift({...child.val(),firebaseKey:child.key}));
+        if(currentUser){updateDashboard();if(document.getElementById('complaints').classList.contains('active'))renderComplaints(complaints);}
     });
     db.ref('notifications').on('value',snap=>{
         notifications=[];
-        snap.forEach(child=>{ notifications.unshift({...child.val(),firebaseKey:child.key}); });
-        if(currentUser){ renderNotifications(); updateBadges(); }
+        snap.forEach(child=>notifications.unshift({...child.val(),firebaseKey:child.key}));
+        if(currentUser){renderNotifications();updateBadges();}
     });
 }
 
-// ========== ALERT POPUP ==========
+// ========== ALERT ==========
 function showAlert(icon,title,message,color='#f7971e'){
     const container=document.getElementById('alertContainer');
     const id='alert_'+Date.now();
@@ -598,45 +604,130 @@ function showAlert(icon,title,message,color='#f7971e'){
     setTimeout(()=>{if(document.getElementById(id))document.getElementById(id).remove();},5000);
 }
 
+// ========== 🎤 VOICE TO TEXT ==========
+function toggleVoice(){
+    const btn=document.getElementById('voiceBtn');
+    const status=document.getElementById('voiceStatus');
+
+    if(recognition){
+        recognition.stop();
+        recognition=null;
+        btn.textContent='🎤 Voice';
+        btn.classList.remove('listening');
+        status.textContent='';
+        return;
+    }
+
+    if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+        alert('Voice not supported! Please use Chrome browser.');
+        return;
+    }
+
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    recognition=new SR();
+
+    // Language based on app language
+    const langMap={'en':'en-IN','ta':'ta-IN','hi':'hi-IN','te':'te-IN','ml':'ml-IN'};
+    recognition.lang=langMap[currentLang]||'ta-IN';
+    recognition.continuous=true;
+    recognition.interimResults=true;
+
+    btn.textContent='🔴 Stop';
+    btn.classList.add('listening');
+    status.textContent='🎤 Listening... Speak now!';
+    status.style.color='#56ab2f';
+
+    let finalTranscript='';
+
+    recognition.onresult=(event)=>{
+        let interim='';
+        for(let i=event.resultIndex;i<event.results.length;i++){
+            if(event.results[i].isFinal){
+                finalTranscript+=event.results[i][0].transcript+' ';
+            }else{
+                interim+=event.results[i][0].transcript;
+            }
+        }
+        const textarea=document.getElementById('compDesc');
+        // Show final + interim preview
+        textarea.value=finalTranscript+(interim?'['+interim+']':'');
+        status.textContent='🎤 Speaking: "'+interim+'"';
+    };
+
+    recognition.onerror=(event)=>{
+        btn.textContent='🎤 Voice';
+        btn.classList.remove('listening');
+        recognition=null;
+        if(event.error==='not-allowed'){
+            status.textContent='❌ Allow microphone permission!';
+            status.style.color='#e94560';
+            alert('Please allow microphone access in browser settings!');
+        }else if(event.error==='no-speech'){
+            status.textContent='No speech detected. Try again.';
+            status.style.color='#ffd200';
+        }else{
+            status.textContent='Voice error: '+event.error;
+            status.style.color='#e94560';
+        }
+    };
+
+    recognition.onend=()=>{
+        // Clean interim brackets
+        const textarea=document.getElementById('compDesc');
+        textarea.value=textarea.value.replace(/\[.*?\]/g,'').trim();
+        btn.textContent='🎤 Voice';
+        btn.classList.remove('listening');
+        recognition=null;
+        if(textarea.value){
+            status.textContent='✅ Voice captured! Click Submit.';
+            status.style.color='#56ab2f';
+        }else{
+            status.textContent='';
+        }
+    };
+
+    recognition.start();
+    showAlert('🎤','Voice Active!','Speak in '+recognition.lang+' - Click Stop when done','#56ab2f');
+}
+
 // ========== TRANSLATIONS ==========
 const T={
-    en:{loginTitle:'🔐 Smart Complaint System',loginBtn:'LOGIN',registerLink:'New User? Register Here',citizen:'Citizen',admin:'Admin',regTitle:'📝 Citizen Registration',regBtn:'REGISTER',loginLink:'Already registered? Login',tabDash:'Dashboard',tabComp:'Complaints',tabSubmit:'Submit Complaint',tabTrans:'AI Translate',tabAlerts:'Notifications',tabProfile:'Profile',logout:'Logout',dbStatus:'Connected to Firebase Cloud',langBar:'English',totalLabel:'Total',pendingLabel:'Pending',progressLabel:'In Progress',resolvedLabel:'Resolved',recentTitle:'🕐 Recent Complaints',submitFormTitle:'📋 Submit New Complaint',compTitlePh:'Complaint Title',locationPh:'Location / Address',contactPh:'Contact Number',descPh:'Describe your complaint...',submitBtn:'SUBMIT COMPLAINT 🚀',allCompTitle:'📋 All Complaints',transTitle:'App Language',transDesc:'Select language to change entire app',quickTransTitle:'📋 Quick Translator',quickTransDesc:'Type in your language → Translate to English',quickTransBtn:'⚡ TRANSLATE TO ENGLISH',transResultLabel:'✅ Translated:',copyBtn:'📋 Copy to Form',notifTitle:'🔔 Notifications',feedbackTitle:'⭐ Rate & Feedback',cancelBtn:'Cancel',confirmBtn:'Submit',noComplaints:'No complaints yet!',noNotif:'No notifications!',pTotalLabel:'Total',pPendingLabel:'Pending',pResolvedLabel:'Resolved',liveLocBtn:'📍 Live',translateBtn:'🌐 Translate',translatedLabel:'🌐 Translated:',originalLabel:'📝 Original',welcomeText:'Welcome back!',welcomeSub:'Real-time Firebase powered management',qaSubmit:'Submit Complaint',qaView:'View Complaints',qaTranslate:'AI Translate'},
-    ta:{loginTitle:'🔐 புகார் மேலாண்மை அமைப்பு',loginBtn:'உள்நுழை',registerLink:'புதிய பயனர்? பதிவு செய்யுங்கள்',citizen:'குடிமகன்',admin:'நிர்வாகி',regTitle:'📝 குடிமகன் பதிவு',regBtn:'பதிவு செய்',loginLink:'ஏற்கனவே பதிவு? உள்நுழைய',tabDash:'டாஷ்போர்டு',tabComp:'புகார்கள்',tabSubmit:'புகார் சமர்ப்பி',tabTrans:'மொழிபெயர்ப்பு',tabAlerts:'அறிவிப்புகள்',tabProfile:'சுயவிவரம்',logout:'வெளியேறு',dbStatus:'Firebase Cloud இணைக்கப்பட்டது',langBar:'தமிழ்',totalLabel:'மொத்தம்',pendingLabel:'நிலுவையில்',progressLabel:'செயல்பாட்டில்',resolvedLabel:'தீர்க்கப்பட்டது',recentTitle:'🕐 சமீபத்திய புகார்கள்',submitFormTitle:'📋 புதிய புகாரை சமர்ப்பிக்கவும்',compTitlePh:'புகாரின் தலைப்பு',locationPh:'இடம் / முகவரி',contactPh:'தொடர்பு எண்',descPh:'புகாரை விவரிக்கவும்...',submitBtn:'புகாரை சமர்ப்பி 🚀',allCompTitle:'📋 அனைத்து புகார்கள்',transTitle:'செயலி மொழி',transDesc:'மொழியை தேர்ந்தெடுக்கவும்',quickTransTitle:'📋 விரைவு மொழிபெயர்ப்பு',quickTransDesc:'உங்கள் மொழியில் → ஆங்கிலம்',quickTransBtn:'⚡ ஆங்கிலத்தில் மொழிபெயர்க்கவும்',transResultLabel:'✅ மொழிபெயர்க்கப்பட்டது:',copyBtn:'📋 படிவத்தில் நகலெடு',notifTitle:'🔔 அறிவிப்புகள்',feedbackTitle:'⭐ மதிப்பீடு',cancelBtn:'ரத்து',confirmBtn:'சமர்ப்பி',noComplaints:'புகார்கள் இல்லை!',noNotif:'அறிவிப்புகள் இல்லை!',pTotalLabel:'மொத்தம்',pPendingLabel:'நிலுவை',pResolvedLabel:'தீர்க்கப்பட்டது',liveLocBtn:'📍 நேரடி',translateBtn:'🌐 மொழிபெயர்',translatedLabel:'🌐 மொழிபெயர்க்கப்பட்டது:',originalLabel:'📝 அசல்',welcomeText:'வணக்கம்!',welcomeSub:'Firebase Cloud நேரடி மேலாண்மை',qaSubmit:'புகார் சமர்ப்பி',qaView:'புகார்கள் பார்',qaTranslate:'மொழிபெயர்ப்பு'},
-    hi:{loginTitle:'🔐 स्मार्ट शिकायत प्रणाली',loginBtn:'लॉगिन',registerLink:'नए उपयोगकर्ता? पंजीकरण करें',citizen:'नागरिक',admin:'प्रशासक',regTitle:'📝 नागरिक पंजीकरण',regBtn:'पंजीकरण करें',loginLink:'पहले से पंजीकृत? लॉगिन',tabDash:'डैशबोर्ड',tabComp:'शिकायतें',tabSubmit:'शिकायत दर्ज',tabTrans:'अनुवाद',tabAlerts:'सूचनाएं',tabProfile:'प्रोफ़ाइल',logout:'लॉगआउट',dbStatus:'Firebase Cloud से जुड़ा',langBar:'हिंदी',totalLabel:'कुल',pendingLabel:'लंबित',progressLabel:'प्रक्रिया में',resolvedLabel:'हल किया',recentTitle:'🕐 हालिया शिकायतें',submitFormTitle:'📋 नई शिकायत',compTitlePh:'शिकायत शीर्षक',locationPh:'स्थान / पता',contactPh:'संपर्क नंबर',descPh:'शिकायत विस्तार से बताएं...',submitBtn:'शिकायत दर्ज करें 🚀',allCompTitle:'📋 सभी शिकायतें',transTitle:'ऐप भाषा',transDesc:'भाषा चुनें',quickTransTitle:'📋 त्वरित अनुवाद',quickTransDesc:'अपनी भाषा में → अंग्रेजी',quickTransBtn:'⚡ अंग्रेजी में अनुवाद करें',transResultLabel:'✅ अनुवादित:',copyBtn:'📋 फ़ॉर्म में कॉपी',notifTitle:'🔔 सूचनाएं',feedbackTitle:'⭐ रेटिंग',cancelBtn:'रद्द',confirmBtn:'जमा',noComplaints:'कोई शिकायत नहीं!',noNotif:'कोई सूचना नहीं!',pTotalLabel:'कुल',pPendingLabel:'लंबित',pResolvedLabel:'हल किया',liveLocBtn:'📍 लाइव',translateBtn:'🌐 अनुवाद',translatedLabel:'🌐 अनुवादित:',originalLabel:'📝 मूल',welcomeText:'स्वागत है!',welcomeSub:'Firebase Cloud रियल-टाइम प्रबंधन',qaSubmit:'शिकायत दर्ज',qaView:'शिकायतें देखें',qaTranslate:'अनुवाद'},
-    te:{loginTitle:'🔐 స్మార్ట్ ఫిర్యాదు వ్యవస్థ',loginBtn:'లాగిన్',registerLink:'కొత్త వినియోగదారుడా? నమోదు చేయండి',citizen:'పౌరుడు',admin:'నిర్వాహకుడు',regTitle:'📝 పౌర నమోదు',regBtn:'నమోదు చేయండి',loginLink:'ఇప్పటికే నమోదు? లాగిన్',tabDash:'డాష్‌బోర్డ్',tabComp:'ఫిర్యాదులు',tabSubmit:'ఫిర్యాదు సమర్పించు',tabTrans:'అనువాదం',tabAlerts:'నోటిఫికేషన్లు',tabProfile:'ప్రొఫైల్',logout:'లాగ్అవుట్',dbStatus:'Firebase Cloud కనెక్ట్',langBar:'తెలుగు',totalLabel:'మొత్తం',pendingLabel:'పెండింగ్',progressLabel:'పురోగతిలో',resolvedLabel:'పరిష్కరించబడింది',recentTitle:'🕐 ఇటీవలి ఫిర్యాదులు',submitFormTitle:'📋 కొత్త ఫిర్యాదు',compTitlePh:'ఫిర్యాదు శీర్షిక',locationPh:'స్థానం / చిరునామా',contactPh:'సంప్రదింపు నంబర్',descPh:'ఫిర్యాదు వివరించండి...',submitBtn:'ఫిర్యాదు సమర్పించు 🚀',allCompTitle:'📋 అన్ని ఫిర్యాదులు',transTitle:'యాప్ భాష',transDesc:'భాష ఎంచుకోండి',quickTransTitle:'📋 త్వరిత అనువాదం',quickTransDesc:'మీ భాషలో → ఆంగ్లం',quickTransBtn:'⚡ ఆంగ్లంలోకి అనువదించండి',transResultLabel:'✅ అనువదించబడింది:',copyBtn:'📋 ఫారమ్‌కు కాపీ',notifTitle:'🔔 నోటిఫికేషన్లు',feedbackTitle:'⭐ రేటింగ్',cancelBtn:'రద్దు',confirmBtn:'సమర్పించు',noComplaints:'ఫిర్యాదులు లేవు!',noNotif:'నోటిఫికేషన్లు లేవు!',pTotalLabel:'మొత్తం',pPendingLabel:'పెండింగ్',pResolvedLabel:'పరిష్కరించబడింది',liveLocBtn:'📍 లైవ్',translateBtn:'🌐 అనువదించు',translatedLabel:'🌐 అనువదించబడింది:',originalLabel:'📝 అసలైన',welcomeText:'స్వాగతం!',welcomeSub:'Firebase Cloud రియల్-టైమ్ నిర్వహణ',qaSubmit:'ఫిర్యాదు సమర్పించు',qaView:'ఫిర్యాదులు చూడు',qaTranslate:'అనువాదం'},
-    ml:{loginTitle:'🔐 സ്മാർട്ട് പരാതി സംവിധാനം',loginBtn:'ലോഗിൻ',registerLink:'പുതിയ ഉപയോക്താവോ? രജിസ്റ്റർ ചെയ്യൂ',citizen:'പൗരൻ',admin:'അഡ്മിൻ',regTitle:'📝 പൗര രജിസ്ട്രേഷൻ',regBtn:'രജിസ്റ്റർ ചെയ്യൂ',loginLink:'ഇതിനകം രജിസ്റ്റർ ചെയ്തോ? ലോഗിൻ',tabDash:'ഡാഷ്‌ബോർഡ്',tabComp:'പരാതികൾ',tabSubmit:'പരാതി സമർപ്പിക്കൂ',tabTrans:'വിവർത്തനം',tabAlerts:'അറിയിപ്പുകൾ',tabProfile:'പ്രൊഫൈൽ',logout:'ലോഗ്ഔട്ട്',dbStatus:'Firebase Cloud ബന്ധിപ്പിച്ചു',langBar:'മലയാളം',totalLabel:'മൊത്തം',pendingLabel:'തീർപ്പാകാത്തത്',progressLabel:'പ്രക്രിയയിൽ',resolvedLabel:'പരിഹരിച്ചത്',recentTitle:'🕐 സമീപകാല പരാതികൾ',submitFormTitle:'📋 പുതിയ പരാതി',compTitlePh:'പരാതി ശീർഷകം',locationPh:'സ്ഥലം / വിലാസം',contactPh:'ബന്ധപ്പെടാൻ',descPh:'പരാതി വിശദീകരിക്കൂ...',submitBtn:'പരാതി സമർപ്പിക്കൂ 🚀',allCompTitle:'📋 എല്ലാ പരാതികൾ',transTitle:'ആപ്പ് ഭാഷ',transDesc:'ഭാഷ തിരഞ്ഞെടുക്കൂ',quickTransTitle:'📋 ദ്രുത വിവർത്തനം',quickTransDesc:'നിങ്ങളുടെ ഭാഷ → ഇംഗ്ലീഷ്',quickTransBtn:'⚡ ഇംഗ്ലീഷിലേക്ക് വിവർത്തനം',transResultLabel:'✅ വിവർത്തനം:',copyBtn:'📋 ഫോമിലേക്ക് കാപ്പി',notifTitle:'🔔 അറിയിപ്പുകൾ',feedbackTitle:'⭐ റേറ്റിംഗ്',cancelBtn:'റദ്ദ്',confirmBtn:'സമർപ്പിക്കൂ',noComplaints:'പരാതികൾ ഇല്ല!',noNotif:'അറിയിപ്പുകൾ ഇല്ല!',pTotalLabel:'മൊത്തം',pPendingLabel:'തീർപ്പാകാത്തത്',pResolvedLabel:'പരിഹരിച്ചത്',liveLocBtn:'📍 ലൈവ്',translateBtn:'🌐 വിവർത്തനം',translatedLabel:'🌐 വിവർത്തനം:',originalLabel:'📝 യഥാർത്ഥ',welcomeText:'സ്വാഗതം!',welcomeSub:'Firebase Cloud റിയൽ-ടൈം നിർവ്വഹണം',qaSubmit:'പരാതി സമർപ്പിക്കൂ',qaView:'പരാതികൾ കാണൂ',qaTranslate:'വിവർത്തനം'}
+    en:{loginTitle:'🔐 Smart Complaint System',loginBtn:'LOGIN',registerLink:'New User? Register Here',citizen:'Citizen',admin:'Admin',regTitle:'📝 Citizen Registration',regBtn:'REGISTER',loginLink:'Already registered? Login',tabDash:'Dashboard',tabComp:'Complaints',tabSubmit:'Submit Complaint',tabTrans:'AI Translate',tabAlerts:'Notifications',tabProfile:'Profile',logout:'Logout',dbStatus:'Connected to Firebase Cloud',langBar:'English',totalLabel:'Total',pendingLabel:'Pending',progressLabel:'In Progress',resolvedLabel:'Resolved',recentTitle:'🕐 Recent Complaints',submitFormTitle:'📋 Submit New Complaint',compTitlePh:'Complaint Title',locationPh:'Location / Address',contactPh:'Contact Number',descPh:'Describe your complaint... or use 🎤 Voice!',submitBtn:'SUBMIT COMPLAINT 🚀',allCompTitle:'📋 All Complaints',transTitle:'App Language',transDesc:'Select language to change entire app',quickTransTitle:'📋 Quick Translator',quickTransDesc:'Type in your language → Translate to English',quickTransBtn:'⚡ TRANSLATE TO ENGLISH',transResultLabel:'✅ Translated:',copyBtn:'📋 Copy to Form',notifTitle:'🔔 Notifications',feedbackTitle:'⭐ Rate & Feedback',cancelBtn:'Cancel',confirmBtn:'Submit',noComplaints:'No complaints yet!',noNotif:'No notifications!',pTotalLabel:'Total',pPendingLabel:'Pending',pResolvedLabel:'Resolved',liveLocBtn:'📍 Live',translateBtn:'🌐 Translate',translatedLabel:'🌐 Translated:',originalLabel:'📝 Original',welcomeText:'Welcome back!',welcomeSub:'Real-time Firebase powered management',qaSubmit:'Submit Complaint',qaView:'View Complaints',qaTranslate:'AI Translate'},
+    ta:{loginTitle:'🔐 புகார் மேலாண்மை அமைப்பு',loginBtn:'உள்நுழை',registerLink:'புதிய பயனர்? பதிவு செய்யுங்கள்',citizen:'குடிமகன்',admin:'நிர்வாகி',regTitle:'📝 குடிமகன் பதிவு',regBtn:'பதிவு செய்',loginLink:'ஏற்கனவே பதிவு? உள்நுழைய',tabDash:'டாஷ்போர்டு',tabComp:'புகார்கள்',tabSubmit:'புகார் சமர்ப்பி',tabTrans:'மொழிபெயர்ப்பு',tabAlerts:'அறிவிப்புகள்',tabProfile:'சுயவிவரம்',logout:'வெளியேறு',dbStatus:'Firebase Cloud இணைக்கப்பட்டது',langBar:'தமிழ்',totalLabel:'மொத்தம்',pendingLabel:'நிலுவையில்',progressLabel:'செயல்பாட்டில்',resolvedLabel:'தீர்க்கப்பட்டது',recentTitle:'🕐 சமீபத்திய புகார்கள்',submitFormTitle:'📋 புதிய புகாரை சமர்ப்பிக்கவும்',compTitlePh:'புகாரின் தலைப்பு',locationPh:'இடம் / முகவரி',contactPh:'தொடர்பு எண்',descPh:'புகாரை விவரிக்கவும்... அல்லது 🎤 Voice பயன்படுத்துங்கள்!',submitBtn:'புகாரை சமர்ப்பி 🚀',allCompTitle:'📋 அனைத்து புகார்கள்',transTitle:'செயலி மொழி',transDesc:'மொழியை தேர்ந்தெடுக்கவும்',quickTransTitle:'📋 விரைவு மொழிபெயர்ப்பு',quickTransDesc:'உங்கள் மொழியில் → ஆங்கிலம்',quickTransBtn:'⚡ ஆங்கிலத்தில் மொழிபெயர்க்கவும்',transResultLabel:'✅ மொழிபெயர்க்கப்பட்டது:',copyBtn:'📋 படிவத்தில் நகலெடு',notifTitle:'🔔 அறிவிப்புகள்',feedbackTitle:'⭐ மதிப்பீடு',cancelBtn:'ரத்து',confirmBtn:'சமர்ப்பி',noComplaints:'புகார்கள் இல்லை!',noNotif:'அறிவிப்புகள் இல்லை!',pTotalLabel:'மொத்தம்',pPendingLabel:'நிலுவை',pResolvedLabel:'தீர்க்கப்பட்டது',liveLocBtn:'📍 நேரடி',translateBtn:'🌐 மொழிபெயர்',translatedLabel:'🌐 மொழிபெயர்க்கப்பட்டது:',originalLabel:'📝 அசல்',welcomeText:'வணக்கம்!',welcomeSub:'Firebase Cloud நேரடி மேலாண்மை',qaSubmit:'புகார் சமர்ப்பி',qaView:'புகார்கள் பார்',qaTranslate:'மொழிபெயர்ப்பு'},
+    hi:{loginTitle:'🔐 स्मार्ट शिकायत प्रणाली',loginBtn:'लॉगिन',registerLink:'नए उपयोगकर्ता? पंजीकरण करें',citizen:'नागरिक',admin:'प्रशासक',regTitle:'📝 नागरिक पंजीकरण',regBtn:'पंजीकरण करें',loginLink:'पहले से पंजीकृत? लॉगिन',tabDash:'डैशबोर्ड',tabComp:'शिकायतें',tabSubmit:'शिकायत दर्ज',tabTrans:'अनुवाद',tabAlerts:'सूचनाएं',tabProfile:'प्रोफ़ाइल',logout:'लॉगआउट',dbStatus:'Firebase Cloud से जुड़ा',langBar:'हिंदी',totalLabel:'कुल',pendingLabel:'लंबित',progressLabel:'प्रक्रिया में',resolvedLabel:'हल किया',recentTitle:'🕐 हालिया शिकायतें',submitFormTitle:'📋 नई शिकायत',compTitlePh:'शिकायत शीर्षक',locationPh:'स्थान / पता',contactPh:'संपर्क नंबर',descPh:'शिकायत बताएं... या 🎤 Voice उपयोग करें!',submitBtn:'शिकायत दर्ज करें 🚀',allCompTitle:'📋 सभी शिकायतें',transTitle:'ऐप भाषा',transDesc:'भाषा चुनें',quickTransTitle:'📋 त्वरित अनुवाद',quickTransDesc:'अपनी भाषा में → अंग्रेजी',quickTransBtn:'⚡ अंग्रेजी में अनुवाद करें',transResultLabel:'✅ अनुवादित:',copyBtn:'📋 फ़ॉर्म में कॉपी',notifTitle:'🔔 सूचनाएं',feedbackTitle:'⭐ रेटिंग',cancelBtn:'रद्द',confirmBtn:'जमा',noComplaints:'कोई शिकायत नहीं!',noNotif:'कोई सूचना नहीं!',pTotalLabel:'कुल',pPendingLabel:'लंबित',pResolvedLabel:'हल किया',liveLocBtn:'📍 लाइव',translateBtn:'🌐 अनुवाद',translatedLabel:'🌐 अनुवादित:',originalLabel:'📝 मूल',welcomeText:'स्वागत है!',welcomeSub:'Firebase Cloud रियल-टाइम प्रबंधन',qaSubmit:'शिकायत दर्ज',qaView:'शिकायतें देखें',qaTranslate:'अनुवाद'},
+    te:{loginTitle:'🔐 స్మార్ట్ ఫిర్యాదు వ్యవస్థ',loginBtn:'లాగిన్',registerLink:'కొత్త వినియోగదారుడా? నమోదు చేయండి',citizen:'పౌరుడు',admin:'నిర్వాహకుడు',regTitle:'📝 పౌర నమోదు',regBtn:'నమోదు చేయండి',loginLink:'ఇప్పటికే నమోదు? లాగిన్',tabDash:'డాష్‌బోర్డ్',tabComp:'ఫిర్యాదులు',tabSubmit:'ఫిర్యాదు సమర్పించు',tabTrans:'అనువాదం',tabAlerts:'నోటిఫికేషన్లు',tabProfile:'ప్రొఫైల్',logout:'లాగ్అవుట్',dbStatus:'Firebase Cloud కనెక్ట్',langBar:'తెలుగు',totalLabel:'మొత్తం',pendingLabel:'పెండింగ్',progressLabel:'పురోగతిలో',resolvedLabel:'పరిష్కరించబడింది',recentTitle:'🕐 ఇటీవలి ఫిర్యాదులు',submitFormTitle:'📋 కొత్త ఫిర్యాదు',compTitlePh:'ఫిర్యాదు శీర్షిక',locationPh:'స్థానం / చిరునామా',contactPh:'సంప్రదింపు నంబర్',descPh:'ఫిర్యాదు వివరించండి... లేదా 🎤 Voice వాడండి!',submitBtn:'ఫిర్యాదు సమర్పించు 🚀',allCompTitle:'📋 అన్ని ఫిర్యాదులు',transTitle:'యాప్ భాష',transDesc:'భాష ఎంచుకోండి',quickTransTitle:'📋 త్వరిత అనువాదం',quickTransDesc:'మీ భాషలో → ఆంగ్లం',quickTransBtn:'⚡ ఆంగ్లంలోకి అనువదించండి',transResultLabel:'✅ అనువదించబడింది:',copyBtn:'📋 ఫారమ్‌కు కాపీ',notifTitle:'🔔 నోటిఫికేషన్లు',feedbackTitle:'⭐ రేటింగ్',cancelBtn:'రద్దు',confirmBtn:'సమర్పించు',noComplaints:'ఫిర్యాదులు లేవు!',noNotif:'నోటిఫికేషన్లు లేవు!',pTotalLabel:'మొత్తం',pPendingLabel:'పెండింగ్',pResolvedLabel:'పరిష్కరించబడింది',liveLocBtn:'📍 లైవ్',translateBtn:'🌐 అనువదించు',translatedLabel:'🌐 అనువదించబడింది:',originalLabel:'📝 అసలైన',welcomeText:'స్వాగతం!',welcomeSub:'Firebase Cloud రియల్-టైమ్ నిర్వహణ',qaSubmit:'ఫిర్యాదు సమర్పించు',qaView:'ఫిర్యాదులు చూడు',qaTranslate:'అనువాదం'},
+    ml:{loginTitle:'🔐 സ്മാർട്ട് പരാതി സംവിധാനം',loginBtn:'ലോഗിൻ',registerLink:'പുതിയ ഉപയോക്താവോ? രജിസ്റ്റർ ചെയ്യൂ',citizen:'പൗരൻ',admin:'അഡ്മിൻ',regTitle:'📝 പൗര രജിസ്ട്രേഷൻ',regBtn:'രജിസ്റ്റർ ചെയ്യൂ',loginLink:'ഇതിനകം രജിസ്റ്റർ ചെയ്തോ? ലോഗിൻ',tabDash:'ഡാഷ്‌ബോർഡ്',tabComp:'പരാതികൾ',tabSubmit:'പരാതി സമർപ്പിക്കൂ',tabTrans:'വിവർത്തനം',tabAlerts:'അറിയിപ്പുകൾ',tabProfile:'പ്രൊഫൈൽ',logout:'ലോഗ്ഔട്ട്',dbStatus:'Firebase Cloud ബന്ധിപ്പിച്ചു',langBar:'മലയാളം',totalLabel:'മൊത്തം',pendingLabel:'തീർപ്പാകാത്തത്',progressLabel:'പ്രക്രിയയിൽ',resolvedLabel:'പരിഹരിച്ചത്',recentTitle:'🕐 സമീപകാല പരാതികൾ',submitFormTitle:'📋 പുതിയ പരാതി',compTitlePh:'പരാതി ശീർഷകം',locationPh:'സ്ഥലം / വിലാസം',contactPh:'ബന്ധപ്പെടാൻ',descPh:'പരാതി വിശദീകരിക്കൂ... അല്ലെങ്കിൽ 🎤 Voice ഉപയോഗിക്കൂ!',submitBtn:'പരാതി സമർപ്പിക്കൂ 🚀',allCompTitle:'📋 എല്ലാ പരാതികൾ',transTitle:'ആപ്പ് ഭാഷ',transDesc:'ഭാഷ തിരഞ്ഞെടുക്കൂ',quickTransTitle:'📋 ദ്രുത വിവർത്തനം',quickTransDesc:'നിങ്ങളുടെ ഭാഷ → ഇംഗ്ലീഷ്',quickTransBtn:'⚡ ഇംഗ്ലീഷിലേക്ക് വിവർത്തനം',transResultLabel:'✅ വിവർത്തനം:',copyBtn:'📋 ഫോമിലേക്ക് കാപ്പി',notifTitle:'🔔 അറിയിപ്പുകൾ',feedbackTitle:'⭐ റേറ്റിംഗ്',cancelBtn:'റദ്ദ്',confirmBtn:'സമർപ്പിക്കൂ',noComplaints:'പരാതികൾ ഇല്ല!',noNotif:'അറിയിപ്പുകൾ ഇല്ല!',pTotalLabel:'മൊത്തം',pPendingLabel:'തീർപ്പാകാത്തത്',pResolvedLabel:'പരിഹരിച്ചത്',liveLocBtn:'📍 ലൈവ്',translateBtn:'🌐 വിവർത്തനം',translatedLabel:'🌐 വിവർത്തനം:',originalLabel:'📝 യഥാർത്ഥ',welcomeText:'സ്വാഗതം!',welcomeSub:'Firebase Cloud റിയൽ-ടൈം നിർവ്വഹണം',qaSubmit:'പരാതി സമർപ്പിക്കൂ',qaView:'പരാതികൾ കാണൂ',qaTranslate:'വിവർത്തനം'}
 };
 
 function applyLang(lang){
     currentLang=lang;
     const t=T[lang];
-    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
-    const ph=(id,val)=>{const el=document.getElementById(id);if(el)el.placeholder=val;};
-    set('loginTitle',t.loginTitle);set('btnLogin',t.loginBtn);set('btnRegisterLink',t.registerLink);
-    set('optCitizen',t.citizen);set('optAdmin',t.admin);set('registerTitle',t.regTitle);
-    set('btnRegister',t.regBtn);set('btnLoginLink',t.loginLink);set('btnLogout',t.logout);
-    set('dbStatusText',t.dbStatus);set('activeLangBar',t.langBar);
-    set('menuDashText',t.tabDash);set('menuCompText',t.tabComp);set('menuSubmitText',t.tabSubmit);
-    set('menuTransText',t.tabTrans);set('menuNotifText',t.tabAlerts);set('menuProfileText',t.tabProfile);
-    set('dTotalLabel',t.totalLabel);set('dPendingLabel',t.pendingLabel);
-    set('dProgressLabel',t.progressLabel);set('dResolvedLabel',t.resolvedLabel);
-    set('recentTitle',t.recentTitle);set('welcomeText',t.welcomeText);set('welcomeSubText',t.welcomeSub);
-    set('qaSubmit',t.qaSubmit);set('qaView',t.qaView);set('qaTranslate',t.qaTranslate);
-    set('submitFormTitle',t.submitFormTitle);set('allCompTitle',t.allCompTitle);
-    set('transTitle',t.transTitle);set('transDesc',t.transDesc);
-    set('quickTransTitle',t.quickTransTitle);set('quickTransDesc',t.quickTransDesc);
-    set('btnQuickTrans',t.quickTransBtn);set('transResultLabel',t.transResultLabel);
-    set('btnCopyComp',t.copyBtn);set('notifTitle',t.notifTitle);
-    set('pTotalLabel',t.pTotalLabel);set('pPendingLabel',t.pPendingLabel);
-    set('pResolvedLabel',t.pResolvedLabel);set('feedbackTitle',t.feedbackTitle);
-    set('btnCancel',t.cancelBtn);set('btnConfirm',t.confirmBtn);
-    ph('compTitle',t.compTitlePh);ph('compLocation',t.locationPh);
-    ph('compContact',t.contactPh);ph('compDesc',t.descPh);
-    set('btnSubmitComp',t.submitBtn);set('livLocBtn',t.liveLocBtn);
+    const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    const p=(id,v)=>{const e=document.getElementById(id);if(e)e.placeholder=v;};
+    s('loginTitle',t.loginTitle);s('btnLogin',t.loginBtn);s('btnRegisterLink',t.registerLink);
+    s('optCitizen',t.citizen);s('optAdmin',t.admin);s('registerTitle',t.regTitle);
+    s('btnRegister',t.regBtn);s('btnLoginLink',t.loginLink);s('btnLogout',t.logout);
+    s('dbStatusText',t.dbStatus);s('activeLangBar',t.langBar);
+    s('menuDashText',t.tabDash);s('menuCompText',t.tabComp);s('menuSubmitText',t.tabSubmit);
+    s('menuTransText',t.tabTrans);s('menuNotifText',t.tabAlerts);s('menuProfileText',t.tabProfile);
+    s('dTotalLabel',t.totalLabel);s('dPendingLabel',t.pendingLabel);
+    s('dProgressLabel',t.progressLabel);s('dResolvedLabel',t.resolvedLabel);
+    s('recentTitle',t.recentTitle);s('welcomeText',t.welcomeText);s('welcomeSubText',t.welcomeSub);
+    s('qaSubmit',t.qaSubmit);s('qaView',t.qaView);s('qaTranslate',t.qaTranslate);
+    s('submitFormTitle',t.submitFormTitle);s('allCompTitle',t.allCompTitle);
+    s('transTitle',t.transTitle);s('transDesc',t.transDesc);
+    s('quickTransTitle',t.quickTransTitle);s('quickTransDesc',t.quickTransDesc);
+    s('btnQuickTrans',t.quickTransBtn);s('transResultLabel',t.transResultLabel);
+    s('btnCopyComp',t.copyBtn);s('notifTitle',t.notifTitle);
+    s('pTotalLabel',t.pTotalLabel);s('pPendingLabel',t.pPendingLabel);
+    s('pResolvedLabel',t.pResolvedLabel);s('feedbackTitle',t.feedbackTitle);
+    s('btnCancel',t.cancelBtn);s('btnConfirm',t.confirmBtn);
+    p('compTitle',t.compTitlePh);p('compLocation',t.locationPh);
+    p('compContact',t.contactPh);p('compDesc',t.descPh);
+    s('btnSubmitComp',t.submitBtn);s('livLocBtn',t.liveLocBtn);
     document.querySelectorAll('.lang-btn').forEach((b,i)=>b.classList.toggle('active',['en','ta','hi','te','ml'][i]===lang));
     ['en','ta','hi','te','ml'].forEach(l=>{const el=document.getElementById('appLang'+l.charAt(0).toUpperCase()+l.slice(1));if(el)el.classList.toggle('active',l===lang);});
 }
-
 function setLang(lang){applyLang(lang);}
 function setAppLang(lang){
     applyLang(lang);
@@ -675,53 +766,29 @@ function toggleTheme(){
     document.getElementById('appThemeIcon').textContent=isDark?'☀️':'🌙';
 }
 
-// ✅ MAP - FIXED
+// MAP
 function initMap(lat,lng){
-    // Destroy old map safely
-    if(leafletMap){
-        try{leafletMap.off();leafletMap.remove();}catch(e){}
-        leafletMap=null;satelliteLayer=null;streetLayer=null;currentMarker=null;
-    }
+    if(leafletMap){try{leafletMap.off();leafletMap.remove();}catch(e){}leafletMap=null;}
     document.getElementById('mapContainer').style.display='block';
-    // Small delay to ensure DOM is ready
     setTimeout(()=>{
         try{
-            leafletMap=L.map('satelliteMap',{zoomControl:true,scrollWheelZoom:true}).setView([lat,lng],17);
-            satelliteLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri Satellite',maxZoom:20,tileSize:256});
-            streetLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:20});
+            leafletMap=L.map('satelliteMap',{zoomControl:true}).setView([lat,lng],17);
+            satelliteLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:20});
+            streetLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:20});
             satelliteLayer.addTo(leafletMap);
-            const redIcon=L.icon({
-                iconUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                shadowUrl:'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]
-            });
+            const redIcon=L.icon({iconUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',shadowUrl:'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]});
             currentMarker=L.marker([lat,lng],{icon:redIcon}).addTo(leafletMap).bindPopup('📍 Your Location').openPopup();
             setTimeout(()=>{try{leafletMap.invalidateSize();}catch(e){}},300);
-        }catch(e){console.error('Map init error:',e);}
+        }catch(e){console.error('Map error:',e);}
     },150);
 }
-
 function switchLayer(type){
     if(!leafletMap)return;
-    try{
-        if(type==='satellite'){
-            if(streetLayer&&leafletMap.hasLayer(streetLayer))leafletMap.removeLayer(streetLayer);
-            if(satelliteLayer&&!leafletMap.hasLayer(satelliteLayer))satelliteLayer.addTo(leafletMap);
-            document.querySelector('.map-btn-sat').style.background='#f7971e';
-            document.querySelector('.map-btn-sat').style.color='#1a1a1a';
-            document.querySelector('.map-btn-street').style.background='rgba(255,255,255,0.15)';
-        }else{
-            if(satelliteLayer&&leafletMap.hasLayer(satelliteLayer))leafletMap.removeLayer(satelliteLayer);
-            if(streetLayer&&!leafletMap.hasLayer(streetLayer))streetLayer.addTo(leafletMap);
-            document.querySelector('.map-btn-street').style.background='#f7971e';
-            document.querySelector('.map-btn-street').style.color='#1a1a1a';
-            document.querySelector('.map-btn-sat').style.background='rgba(255,255,255,0.15)';
-        }
-    }catch(e){console.error('Switch layer error:',e);}
+    if(type==='satellite'){if(streetLayer&&leafletMap.hasLayer(streetLayer))leafletMap.removeLayer(streetLayer);if(satelliteLayer&&!leafletMap.hasLayer(satelliteLayer))satelliteLayer.addTo(leafletMap);document.querySelector('.map-btn-sat').style.background='#f7971e';document.querySelector('.map-btn-street').style.background='rgba(255,255,255,0.15)';}
+    else{if(satelliteLayer&&leafletMap.hasLayer(satelliteLayer))leafletMap.removeLayer(satelliteLayer);if(streetLayer&&!leafletMap.hasLayer(streetLayer))streetLayer.addTo(leafletMap);document.querySelector('.map-btn-street').style.background='#f7971e';document.querySelector('.map-btn-sat').style.background='rgba(255,255,255,0.15)';}
 }
-
 function getLocation(){
-    if(!navigator.geolocation){alert('Geolocation not supported!');return;}
+    if(!navigator.geolocation){alert('Not supported!');return;}
     const btn=document.getElementById('livLocBtn');
     btn.textContent='⏳';btn.disabled=true;
     navigator.geolocation.getCurrentPosition(
@@ -730,78 +797,27 @@ function getLocation(){
             document.getElementById('accuracyText').textContent=`🛰️ GPS: ±${acc}m`;
             document.getElementById('accuracyDiv').style.display='block';
             initMap(lat,lng);
-            // Reverse geocode
             fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1&zoom=18`,{headers:{'Accept-Language':'en-US,en'}})
-            .then(r=>r.json())
-            .then(data=>{
+            .then(r=>r.json()).then(data=>{
                 const a=data.address;
-                const parts=[
-                    a.house_number?a.house_number+' '+(a.road||''):(a.road||a.pedestrian||a.footway||''),
-                    a.suburb||a.neighbourhood||a.quarter||'',
-                    a.village||a.town||a.city_district||'',
-                    a.city||a.county||'',
-                    a.state_district||'',
-                    a.state||'',
-                    a.postcode||'',
-                    'India'
-                ].filter(x=>x&&x.trim()!=='').join(', ');
+                const parts=[a.house_number?a.house_number+' '+(a.road||''):(a.road||a.pedestrian||''),a.suburb||a.neighbourhood||'',a.village||a.town||a.city_district||'',a.city||a.county||'',a.state_district||'',a.state||'',a.postcode||'','India'].filter(x=>x&&x.trim()!=='').join(', ');
                 document.getElementById('compLocation').value=parts;
-                // Update marker popup after map init
                 setTimeout(()=>{try{if(currentMarker)currentMarker.bindPopup(`📍 ${parts}`).openPopup();}catch(e){}},500);
                 btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;
-            })
-            .catch(()=>{
-                document.getElementById('compLocation').value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;
-            });
+            }).catch(()=>{document.getElementById('compLocation').value=`${lat.toFixed(6)},${lng.toFixed(6)}`;btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;});
         },
-        err=>{
-            let msg='❌ ';
-            if(err.code===1)msg+='Allow location permission!';
-            else if(err.code===2)msg+='Location unavailable!';
-            else msg+='Timeout! Try again.';
-            alert(msg);
-            btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;
-        },
+        err=>{alert('❌ Location failed! Allow permission.');btn.textContent=T[currentLang].liveLocBtn;btn.disabled=false;},
         {enableHighAccuracy:true,timeout:20000,maximumAge:0}
     );
 }
 
-// ✅ TRANSLATE API - FIXED WITH 3 APIS
-async function callTranslateAPI(text, from, to){
-    if(!text||!text.trim()||from===to) return text;
+// TRANSLATE
+async function callTranslateAPI(text,from,to){
+    if(!text||!text.trim()||from===to)return text;
     let translated=null;
-
-    // API 1: Google Translate
-    try{
-        const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`);
-        const data=await res.json();
-        if(data&&data[0]&&Array.isArray(data[0])){
-            const result=data[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
-            if(result&&result.trim()!==''&&result!==text) translated=result;
-        }
-    }catch(e){}
-
-    // API 2: MyMemory
-    if(!translated){
-        try{
-            const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`);
-            const data=await res.json();
-            if(data&&data.responseStatus===200&&data.responseData&&data.responseData.translatedText&&data.responseData.translatedText!==text){
-                translated=data.responseData.translatedText;
-            }
-        }catch(e){}
-    }
-
-    // API 3: Lingva
-    if(!translated){
-        try{
-            const res=await fetch(`https://lingva.ml/api/v1/${from}/${to}/${encodeURIComponent(text)}`);
-            const data=await res.json();
-            if(data&&data.translation&&data.translation!==text) translated=data.translation;
-        }catch(e){}
-    }
-
+    try{const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`);const data=await res.json();if(data&&data[0]&&Array.isArray(data[0])){const r=data[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');if(r&&r!==text)translated=r;}}catch(e){}
+    if(!translated){try{const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`);const data=await res.json();if(data&&data.responseStatus===200&&data.responseData&&data.responseData.translatedText!==text)translated=data.responseData.translatedText;}catch(e){}}
+    if(!translated){try{const res=await fetch(`https://lingva.ml/api/v1/${from}/${to}/${encodeURIComponent(text)}`);const data=await res.json();if(data&&data.translation&&data.translation!==text)translated=data.translation;}catch(e){}}
     return translated||text;
 }
 
@@ -811,44 +827,29 @@ async function quickTranslate(){
     if(!text){alert('Please enter text!');return;}
     const btn=document.getElementById('btnQuickTrans');
     const status=document.getElementById('transStatus');
-    btn.disabled=true;btn.textContent='⏳ Translating...';
+    btn.disabled=true;btn.textContent='⏳...';
     document.getElementById('quickResult').style.display='none';
-    status.textContent='🔄 Connecting to translation API...';
+    status.textContent='🔄 Translating...';
     const translated=await callTranslateAPI(text,from,'en');
     btn.disabled=false;btn.textContent=T[currentLang].quickTransBtn;
-    if(translated&&translated!==text){
-        document.getElementById('quickOutput').value=translated;
-        document.getElementById('quickResult').style.display='block';
-        status.textContent='✅ Translation successful!';
-        setTimeout(()=>status.textContent='',4000);
-    }else{
-        status.textContent='❌ Translation failed! Check internet connection.';
-    }
+    if(translated&&translated!==text){document.getElementById('quickOutput').value=translated;document.getElementById('quickResult').style.display='block';status.textContent='✅ Done!';setTimeout(()=>status.textContent='',3000);}
+    else{status.textContent='❌ Failed! Check internet.';}
 }
 
 async function translateComplaint(id,btnEl){
-    if(currentLang==='en'){alert('Please select Tamil/Hindi/Telugu/Malayalam in AI Translate tab first!');return;}
+    if(currentLang==='en'){alert('Select Tamil/Hindi/Telugu/Malayalam in AI Translate!');return;}
     const c=complaints.find(comp=>comp.id===id);
     if(!c)return;
     const origText=btnEl.textContent;
     btnEl.textContent='⏳...';btnEl.disabled=true;
-    const textToTranslate=c.title+(c.desc?'. '+c.desc:'');
-    const translated=await callTranslateAPI(textToTranslate,'en',currentLang);
+    const translated=await callTranslateAPI(c.title+'. '+c.desc,'en',currentLang);
     btnEl.textContent=origText;btnEl.disabled=false;
-    if(translated&&translated!==textToTranslate){
-        try{
-            await db.ref('complaints/'+c.firebaseKey).update({translatedText:translated,translatedLang:currentLang});
-        }catch(e){alert('Save failed: '+e.message);}
-    }else{
-        alert('Translation failed! Check internet connection.');
-    }
+    if(translated&&translated!==c.title+'. '+c.desc){
+        try{await db.ref('complaints/'+c.firebaseKey).update({translatedText:translated,translatedLang:currentLang});}catch(e){alert('Save failed!');}
+    }else{alert('Translation failed!');}
 }
 
-function copyToComplaint(){
-    document.getElementById('compDesc').value=document.getElementById('quickOutput').value;
-    showPage('submit');closeSidebar();
-    alert('✅ Copied to complaint form!');
-}
+function copyToComplaint(){document.getElementById('compDesc').value=document.getElementById('quickOutput').value;showPage('submit');closeSidebar();alert('✅ Copied!');}
 
 // AUTH
 async function register(){
@@ -874,11 +875,8 @@ async function login(){
     if(!username||!password){alert('Please enter username and password!');return;}
     const snap=await db.ref('users').orderByChild('username').equalTo(username).once('value');
     let user=null;
-    snap.forEach(child=>{
-        const u=child.val();
-        if(u.password===password&&u.role===role) user={...u,firebaseKey:child.key};
-    });
-    if(!user){alert('Invalid credentials! Check username, password and role.');return;}
+    snap.forEach(child=>{const u=child.val();if(u.password===password&&u.role===role)user={...u,firebaseKey:child.key};});
+    if(!user){alert('Invalid credentials!');return;}
     currentUser=user;
     applyLang(user.lang||'en');
     document.getElementById('loginPage').style.display='none';
@@ -888,9 +886,9 @@ async function login(){
         document.getElementById('menuSubmit').style.display='none';
         document.getElementById('quickTransBox').style.display='none';
         document.getElementById('quickActions').innerHTML=`
-            <div class="quick-action" onclick="showPage('complaints');closeSidebar();"><div class="qa-icon">📋</div><h4>All Complaints</h4><p>Manage all complaints</p></div>
+            <div class="quick-action" onclick="showPage('complaints');closeSidebar();"><div class="qa-icon">📋</div><h4>All Complaints</h4><p>Manage complaints</p></div>
             <div class="quick-action" onclick="showPage('translator');closeSidebar();"><div class="qa-icon">🌐</div><h4>AI Translate</h4><p>Translate complaints</p></div>
-            <div class="quick-action" onclick="showPage('notifications');closeSidebar();"><div class="qa-icon">🔔</div><h4>Notifications</h4><p>View all alerts</p></div>`;
+            <div class="quick-action" onclick="showPage('notifications');closeSidebar();"><div class="qa-icon">🔔</div><h4>Notifications</h4><p>View alerts</p></div>`;
     }else{
         document.getElementById('menuSubmit').style.display='flex';
         document.getElementById('quickTransBox').style.display='block';
@@ -901,8 +899,8 @@ async function login(){
 }
 
 function logout(){
-    clearTranslator();
-    currentUser=null;
+    if(recognition){recognition.stop();recognition=null;}
+    clearTranslator();currentUser=null;
     document.getElementById('mainApp').style.display='none';
     showHome();
 }
@@ -911,17 +909,15 @@ function showLogin(){document.getElementById('registerPage').style.display='none
 
 function showPage(page){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    const pageEl=document.getElementById(page);
-    if(pageEl)pageEl.classList.add('active');
-    ['dashboard','complaints','submit','translator','notifications','profile'].forEach(p=>{
-        const el=document.getElementById('menu'+p.charAt(0).toUpperCase()+p.slice(1));
-        if(el)el.classList.toggle('active',p===page);
-    });
+    const el=document.getElementById(page);if(el)el.classList.add('active');
+    ['dashboard','complaints','submit','translator','notifications','profile'].forEach(p=>{const e=document.getElementById('menu'+p.charAt(0).toUpperCase()+p.slice(1));if(e)e.classList.toggle('active',p===page);});
     if(page==='complaints')renderComplaints(complaints);
     if(page==='dashboard')updateDashboard();
     if(page==='notifications')renderNotifications();
     if(page==='profile')renderProfile();
-    if(page==='submit'&&leafletMap){setTimeout(()=>{try{leafletMap.invalidateSize();}catch(e){}},300);}
+    if(page==='submit'&&leafletMap)setTimeout(()=>{try{leafletMap.invalidateSize();}catch(e){}},300);
+    // Stop voice when leaving submit
+    if(page!=='submit'&&recognition){recognition.stop();recognition=null;}
 }
 
 function previewImage(){
@@ -929,7 +925,6 @@ function previewImage(){
     if(file){const r=new FileReader();r.onload=e=>{document.getElementById('imgPreview').src=e.target.result;document.getElementById('imgPreview').style.display='block';};r.readAsDataURL(file);}
 }
 
-// ✅ SUBMIT - FIXED AUTO TRANSLATE
 async function submitComplaint(){
     const title=document.getElementById('compTitle').value.trim();
     const category=document.getElementById('compCategory').value;
@@ -937,154 +932,91 @@ async function submitComplaint(){
     const priority=document.getElementById('compPriority').value;
     const dept=document.getElementById('compDept').value;
     const contact=document.getElementById('compContact').value.trim();
-    const desc=document.getElementById('compDesc').value.trim();
+    // Clean voice interim brackets before submit
+    const descEl=document.getElementById('compDesc');
+    descEl.value=descEl.value.replace(/\[.*?\]/g,'').trim();
+    const desc=descEl.value;
     const imgEl=document.getElementById('imgPreview');
     const hasImg=imgEl.style.display!=='none'&&imgEl.src&&imgEl.src!==window.location.href;
     if(!title||!location||!desc){alert('Please fill Title, Location and Description!');return;}
-
+    // Stop voice if running
+    if(recognition){recognition.stop();recognition=null;}
     const btn=document.getElementById('btnSubmitComp');
     const loading=document.getElementById('submitLoading');
     btn.disabled=true;loading.style.display='block';
-
-    const originalTitle=title;
-    const originalDesc=desc;
-    const userLang=currentLang;
-    let englishTitle=title;
-    let englishDesc=desc;
-
-    // ✅ Auto translate to English if not English
+    const originalTitle=title,originalDesc=desc,userLang=currentLang;
+    let englishTitle=title,englishDesc=desc;
     if(currentLang!=='en'){
-        loading.textContent='🔄 Auto-translating to English for admin...';
+        loading.textContent='🔄 Auto-translating...';
         try{
-            // Force Google Translate directly
             const encTitle=encodeURIComponent(title);
             const encDesc=encodeURIComponent(desc);
-
             const r1=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${currentLang}&tl=en&dt=t&q=${encTitle}`);
             const d1=await r1.json();
-            if(d1&&d1[0]&&d1[0][0]&&d1[0][0][0]){
-                englishTitle=d1[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
-            }
-
+            if(d1&&d1[0]&&d1[0][0]&&d1[0][0][0])englishTitle=d1[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
             const r2=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${currentLang}&tl=en&dt=t&q=${encDesc}`);
             const d2=await r2.json();
-            if(d2&&d2[0]&&d2[0][0]&&d2[0][0][0]){
-                englishDesc=d2[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
-            }
-
-            // Fallback: MyMemory if Google failed
-            if(!englishTitle||englishTitle===title){
-                const r3=await fetch(`https://api.mymemory.translated.net/get?q=${encTitle}&langpair=${currentLang}|en`);
-                const d3=await r3.json();
-                if(d3.responseStatus===200&&d3.responseData.translatedText!==title)
-                    englishTitle=d3.responseData.translatedText;
-            }
-            if(!englishDesc||englishDesc===desc){
-                const r4=await fetch(`https://api.mymemory.translated.net/get?q=${encDesc}&langpair=${currentLang}|en`);
-                const d4=await r4.json();
-                if(d4.responseStatus===200&&d4.responseData.translatedText!==desc)
-                    englishDesc=d4.responseData.translatedText;
-            }
-
-            console.log('✅ Translated Title:',englishTitle);
-            console.log('✅ Translated Desc:',englishDesc);
-        }catch(e){
-            console.log('❌ Auto-translate error:',e);
-        }
+            if(d2&&d2[0]&&d2[0][0]&&d2[0][0][0])englishDesc=d2[0].map(x=>x&&x[0]?x[0]:'').filter(Boolean).join('');
+            if(!englishTitle||englishTitle===title){const r3=await fetch(`https://api.mymemory.translated.net/get?q=${encTitle}&langpair=${currentLang}|en`);const d3=await r3.json();if(d3.responseStatus===200&&d3.responseData.translatedText!==title)englishTitle=d3.responseData.translatedText;}
+            if(!englishDesc||englishDesc===desc){const r4=await fetch(`https://api.mymemory.translated.net/get?q=${encDesc}&langpair=${currentLang}|en`);const d4=await r4.json();if(d4.responseStatus===200&&d4.responseData.translatedText!==desc)englishDesc=d4.responseData.translatedText;}
+        }catch(e){console.log('Translate error:',e);}
     }
-
-    loading.textContent='☁️ Saving to Firebase Cloud...';
+    loading.textContent='☁️ Saving to Firebase...';
     const complaintId='CMP'+Date.now().toString().slice(-6);
-    const data={
-        id:Date.now(),complaintId,
-        title:englishTitle,
-        desc:englishDesc,
-        originalTitle,
-        originalDesc,
-        userLang,
-        category,location,priority,dept,contact,
-        image:hasImg?imgEl.src:null,
-        status:'Pending',
-        citizen:currentUser.name,
-        username:currentUser.username,
-        phone:currentUser.phone||'',
-        email:currentUser.email||'',
-        date:new Date().toLocaleDateString(),
-        feedback:null,rating:null,
-        translatedText:null,translatedLang:null,
-        timestamp:firebase.database.ServerValue.TIMESTAMP
-    };
-
+    const data={id:Date.now(),complaintId,title:englishTitle,desc:englishDesc,originalTitle,originalDesc,userLang,category,location,priority,dept,contact,image:hasImg?imgEl.src:null,status:'Pending',citizen:currentUser.name,username:currentUser.username,phone:currentUser.phone||'',email:currentUser.email||'',date:new Date().toLocaleDateString(),feedback:null,rating:null,translatedText:null,translatedLang:null,timestamp:firebase.database.ServerValue.TIMESTAMP};
     try{
         await db.ref('complaints').push(data);
         await db.ref('notifications').push({msg:'✅ '+englishTitle+' (ID: '+complaintId+')',userId:currentUser.username,date:new Date().toLocaleString(),timestamp:Date.now()});
         await db.ref('notifications').push({msg:'🆕 '+currentUser.name+': '+englishTitle+' | 📱 '+data.phone+' | 📧 '+data.email,userId:'admin',date:new Date().toLocaleString(),timestamp:Date.now()});
-    }catch(e){
-        alert('Firebase save error: '+e.message);
-        btn.disabled=false;loading.style.display='none';
-        return;
-    }
-
+    }catch(e){alert('Firebase error: '+e.message);btn.disabled=false;loading.style.display='none';return;}
     btn.disabled=false;loading.style.display='none';
-
-    // Email/SMS simulation popups
-    showAlert('📧','Email Sent!','Complaint '+complaintId+' submitted! Check '+( currentUser.email||'your email'),'#4fc3f7');
-    setTimeout(()=>showAlert('📱','SMS Sent!','SMS to '+(currentUser.phone||'your phone')+': Complaint '+complaintId+' received!','#56ab2f'),1500);
-
-    // Reset form
+    showAlert('📧','Email Sent!','Complaint '+complaintId+' submitted! Check '+(currentUser.email||'your email'),'#4fc3f7');
+    setTimeout(()=>showAlert('📱','SMS Sent!','SMS to '+(currentUser.phone||'your phone')+': '+complaintId+' received!','#56ab2f'),1500);
     document.getElementById('compTitle').value='';
     document.getElementById('compLocation').value='';
     document.getElementById('compDesc').value='';
     document.getElementById('compContact').value='';
+    document.getElementById('voiceStatus').textContent='';
     document.getElementById('imgPreview').style.display='none';
     document.getElementById('mapContainer').style.display='none';
     document.getElementById('accuracyDiv').style.display='none';
     if(leafletMap){try{leafletMap.off();leafletMap.remove();}catch(e){}leafletMap=null;}
-
     alert('✅ Complaint submitted! ID: '+complaintId);
     showPage('complaints');
 }
 
-async function updateStatus(firebaseKey,id,status){
+async function updateStatus(fkey,id,status){
     try{
-        await db.ref('complaints/'+firebaseKey).update({status});
+        await db.ref('complaints/'+fkey).update({status});
         const comp=complaints.find(c=>c.id===id);
         if(comp){
             await db.ref('notifications').push({msg:'📢 '+comp.title+' → '+status,userId:comp.username,date:new Date().toLocaleString(),timestamp:Date.now()});
-            showAlert('📧','Status Update!','Complaint '+comp.complaintId+' is now "'+status+'" | 📧 '+(comp.email||'N/A'),'#4fc3f7');
-            setTimeout(()=>showAlert('📱','SMS Update!','SMS to '+(comp.phone||'N/A')+': Your complaint is now "'+status+'"','#56ab2f'),1000);
+            showAlert('📧','Status Update!',comp.complaintId+' is now "'+status+'" | 📧 '+(comp.email||'N/A'),'#4fc3f7');
+            setTimeout(()=>showAlert('📱','SMS!','SMS to '+(comp.phone||'N/A')+': Your complaint is "'+status+'"','#56ab2f'),1000);
         }
-    }catch(e){alert('Update failed: '+e.message);}
+    }catch(e){alert('Update failed!');}
 }
 
-async function deleteComplaint(firebaseKey){
-    if(!confirm('Delete this complaint?'))return;
-    try{await db.ref('complaints/'+firebaseKey).remove();}
-    catch(e){alert('Delete failed: '+e.message);}
+async function deleteComplaint(fkey){
+    if(!confirm('Delete?'))return;
+    try{await db.ref('complaints/'+fkey).remove();}catch(e){alert('Delete failed!');}
 }
 
 function printComplaint(id){
-    const c=complaints.find(comp=>comp.id===id);
-    if(!c)return;
+    const c=complaints.find(comp=>comp.id===id);if(!c)return;
     const w=window.open('','_blank');
-    w.document.write(`<html><head><title>${c.complaintId}</title><style>body{font-family:Arial;padding:30px;}h2{color:#f7971e;}table{width:100%;border-collapse:collapse;margin-top:20px;}td{padding:10px;border:1px solid #ddd;}.s{color:green;font-weight:bold;}</style></head><body><h2>🏛️ Smart Complaint & Service Request System</h2><h3>Official Complaint Report</h3><table><tr><td><b>ID</b></td><td>${c.complaintId}</td></tr><tr><td><b>Title</b></td><td>${c.title}</td></tr>${c.originalTitle&&c.userLang!=='en'?`<tr><td><b>Original(${c.userLang})</b></td><td>${c.originalTitle}</td></tr>`:''}<tr><td><b>Category</b></td><td>${c.category}</td></tr><tr><td><b>Dept</b></td><td>${c.dept}</td></tr><tr><td><b>Location</b></td><td>${c.location}</td></tr><tr><td><b>Priority</b></td><td>${c.priority}</td></tr><tr><td><b>Description</b></td><td>${c.desc}</td></tr><tr><td><b>Citizen</b></td><td>${c.citizen}</td></tr><tr><td><b>Phone</b></td><td>${c.phone||c.contact||'N/A'}</td></tr><tr><td><b>Email</b></td><td>${c.email||'N/A'}</td></tr><tr><td><b>Date</b></td><td>${c.date}</td></tr><tr><td><b>Status</b></td><td class="s">${c.status}</td></tr>${c.feedback?`<tr><td><b>Feedback</b></td><td>${c.feedback} (${'★'.repeat(c.rating||0)})</td></tr>`:''}</table><p style="color:#aaa;font-size:11px;margin-top:20px;">Generated: ${new Date().toLocaleString()} | Firebase Cloud</p><script>window.print();<\/script></body></html>`);
+    w.document.write(`<html><head><title>${c.complaintId}</title><style>body{font-family:Arial;padding:30px;}h2{color:#f7971e;}table{width:100%;border-collapse:collapse;margin-top:20px;}td{padding:10px;border:1px solid #ddd;}.s{color:green;font-weight:bold;}</style></head><body><h2>🏛️ Smart Complaint & Service Request System</h2><h3>Official Complaint Report</h3><table><tr><td><b>ID</b></td><td>${c.complaintId}</td></tr><tr><td><b>Title</b></td><td>${c.title}</td></tr>${c.originalTitle&&c.userLang!=='en'?`<tr><td><b>Original(${c.userLang})</b></td><td>${c.originalTitle}</td></tr>`:''}<tr><td><b>Category</b></td><td>${c.category}</td></tr><tr><td><b>Dept</b></td><td>${c.dept}</td></tr><tr><td><b>Location</b></td><td>${c.location}</td></tr><tr><td><b>Priority</b></td><td>${c.priority}</td></tr><tr><td><b>Description</b></td><td>${c.desc}</td></tr><tr><td><b>Citizen</b></td><td>${c.citizen}</td></tr><tr><td><b>Phone</b></td><td>${c.phone||'N/A'}</td></tr><tr><td><b>Email</b></td><td>${c.email||'N/A'}</td></tr><tr><td><b>Date</b></td><td>${c.date}</td></tr><tr><td><b>Status</b></td><td class="s">${c.status}</td></tr>${c.feedback?`<tr><td><b>Feedback</b></td><td>${c.feedback} (${'★'.repeat(c.rating||0)})</td></tr>`:''}</table><p style="color:#aaa;font-size:11px;margin-top:20px;">Generated: ${new Date().toLocaleString()}</p><script>window.print();<\/script></body></html>`);
 }
 
-function searchComplaints(){
-    const q=document.getElementById('searchInput').value.toLowerCase();
-    renderComplaints(complaints.filter(c=>(c.title||'').toLowerCase().includes(q)||(c.location||'').toLowerCase().includes(q)||(c.complaintId||'').toLowerCase().includes(q)));
-}
-function filterComplaints(){
-    const s=document.getElementById('filterStatus').value;
-    renderComplaints(s==='All'?complaints:complaints.filter(c=>c.status===s));
-}
+function searchComplaints(){const q=document.getElementById('searchInput').value.toLowerCase();renderComplaints(complaints.filter(c=>(c.title||'').toLowerCase().includes(q)||(c.location||'').toLowerCase().includes(q)||(c.complaintId||'').toLowerCase().includes(q)));}
+function filterComplaints(){const s=document.getElementById('filterStatus').value;renderComplaints(s==='All'?complaints:complaints.filter(c=>c.status===s));}
 
 function updateBadges(){
     if(!currentUser)return;
     const list=currentUser.role==='citizen'?complaints.filter(c=>c.username===currentUser.username):complaints;
     document.getElementById('pendingBadge').textContent=list.filter(c=>c.status==='Pending').length;
-    const myNotifs=notifications.filter(n=>n.userId===currentUser.username||(n.userId==='admin'&&currentUser.role==='admin'));
-    document.getElementById('notifBadge').textContent=myNotifs.length;
+    const myN=notifications.filter(n=>n.userId===currentUser.username||(n.userId==='admin'&&currentUser.role==='admin'));
+    document.getElementById('notifBadge').textContent=myN.length;
 }
 
 function updateDashboard(){
@@ -1160,13 +1092,13 @@ function renderProfile(){
 function renderNotifications(){
     if(!currentUser)return;
     const t=T[currentLang];
-    const myNotifs=notifications.filter(n=>n.userId===currentUser.username||(n.userId==='admin'&&currentUser.role==='admin'));
-    document.getElementById('notifList').innerHTML=myNotifs.length?myNotifs.map(n=>`<div class="notif-item"><p>${n.msg}</p><span>${n.date}</span></div>`).join(''):`<div class="empty-msg">${t.noNotif}</div>`;
-    document.getElementById('notifBadge').textContent=myNotifs.length;
+    const myN=notifications.filter(n=>n.userId===currentUser.username||(n.userId==='admin'&&currentUser.role==='admin'));
+    document.getElementById('notifList').innerHTML=myN.length?myN.map(n=>`<div class="notif-item"><p>${n.msg}</p><span>${n.date}</span></div>`).join(''):`<div class="empty-msg">${t.noNotif}</div>`;
+    document.getElementById('notifBadge').textContent=myN.length;
 }
 
-function openFeedback(firebaseKey,id){
-    feedbackComplaintId={firebaseKey,id};selectedRating=0;
+function openFeedback(fkey,id){
+    feedbackComplaintId={firebaseKey:fkey,id};selectedRating=0;
     document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));
     document.getElementById('feedbackText').value='';
     document.getElementById('feedbackModal').classList.add('open');
@@ -1176,18 +1108,11 @@ function setRating(n){selectedRating=n;document.querySelectorAll('.star').forEac
 async function submitFeedback(){
     if(!selectedRating){alert('Please select a rating!');return;}
     const text=document.getElementById('feedbackText').value.trim();
-    try{
-        await db.ref('complaints/'+feedbackComplaintId.firebaseKey).update({feedback:text||'No comment',rating:selectedRating});
-        closeModal();alert('✅ Thank you for your feedback!');
-    }catch(e){alert('Save failed: '+e.message);}
+    try{await db.ref('complaints/'+feedbackComplaintId.firebaseKey).update({feedback:text||'No comment',rating:selectedRating});closeModal();alert('✅ Thank you!');}
+    catch(e){alert('Save failed!');}
 }
 
-// ========== INIT ==========
-window.onload=async()=>{
-    await initAdminUser();
-    initFirebaseListeners();
-};
+window.onload=async()=>{await initAdminUser();initFirebaseListeners();};
 </script>
 </body>
 </html>
-        
